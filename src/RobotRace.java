@@ -148,7 +148,7 @@ public class RobotRace extends Base {
         fovY = (float) Math.toDegrees(fovY);
 
         // now simply add our calculated values to the method call
-        glu.gluPerspective(fovY, aspect, 0.1, 1000);
+        glu.gluPerspective(40, aspect, 0.1, 1000);
 
         // Set camera.
         gl.glMatrixMode(GL_MODELVIEW);
