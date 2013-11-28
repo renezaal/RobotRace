@@ -144,7 +144,7 @@ public class RobotRace extends Base {
         // we need to take half the height first, then later on multiply by two
         // essentially we create a triangle with a 90 degree angle with the vDist 
         // and the upper half of the height
-        float fovY = (float) Math.atan((0.5f * vHeight) / gs.vDist)*2f;
+        float fovY = (float) Math.atan((0.5f * vHeight) / gs.vDist);
         fovY = (float) Math.toDegrees(fovY);
 
         // now simply add our calculated values to the method call
