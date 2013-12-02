@@ -67,19 +67,19 @@ public class RobotRace extends Base {
         robots = new Robot[4];
 
         // Initialize robot 0
-        robots[0] = new Robot(Material.GOLD
+        robots[0] = new Robot(Material.GOLD, 0, 0, 0
         /* add other parameters that characterize this robot */);
 
         // Initialize robot 1
-        robots[1] = new Robot(Material.SILVER
+        robots[1] = new Robot(Material.SILVER, 3 , 4, 0
         /* add other parameters that characterize this robot */);
 
         // Initialize robot 2
-        robots[2] = new Robot(Material.WOOD
+        robots[2] = new Robot(Material.WOOD, 2 , 3, 0
         /* add other parameters that characterize this robot */);
 
         // Initialize robot 3
-        robots[3] = new Robot(Material.ORANGE
+        robots[3] = new Robot(Material.ORANGE, 1, 3, 0
         /* add other parameters that characterize this robot */);
 
         // Initialize the camera
@@ -343,15 +343,17 @@ public class RobotRace extends Base {
          * The material from which this robot is built.
          */
         private final Material material;
+        private float posX, posY, posZ;
 
         /**
          * Constructs the robot with initial parameters.
          */
-        public Robot(Material material
+        public Robot(Material material, float posX, float posY, float posZ
         /* add other parameters that characterize this robot */) {
             this.material = material;
-
-            // code goes here ...
+            this.posX = posX;
+            this.posY = posY;
+            this.posZ = posZ;    
         }
 
         /**
@@ -360,11 +362,154 @@ public class RobotRace extends Base {
         public void draw(boolean stickFigure) {
             // code goes here ...
             gl.glPushMatrix();
-
-//            gl.glColor3f(0.1f, 0.1f, 0.1f);
-//            gl.glScalef(1f, 1f, 2f);
-//            gl.glTranslatef(0f, 0f, 0.5f);
-//            glut.glutSolidCube(1f);
+            gl.glPopMatrix();
+            gl.glColor3f(0.1f, 0.1f, 0.1f);
+            
+            //Torso
+            gl.glPushMatrix();   
+            gl.glTranslatef(posX+0f, posY+0f, posZ+0f);
+            gl.glScalef(0.75f,1.2f,0.5f);
+            glut.glutSolidSphere(1f, 20, 10);
+            gl.glPopMatrix();
+            
+            //Legs
+            //LeftBack Leg
+            //Upper Leg
+            gl.glPushMatrix();
+            gl.glTranslatef(posX+0.75f, posY+-0.7f, posZ+0.7f);
+            gl.glRotatef(20f,0f,1f,0f);
+            gl.glScalef(0.08f, 0.08f, 2f);
+            glut.glutSolidCube(1f);
+            gl.glPopMatrix();
+            
+            //Bottom Leg
+            gl.glPushMatrix();
+            gl.glTranslatef(posX+1.5f, posY+-0.7f, posZ+0.2f);
+            gl.glRotatef(-15f,0f,1f,0f);
+            gl.glScalef(0.08f, 0.08f, 3f);
+            glut.glutSolidCube(1f);
+            gl.glPopMatrix();
+            
+            //Upper and Bottom Leg joint
+            gl.glPushMatrix();
+            gl.glTranslatef(posX+1.1f, posY+-0.7f, posZ+1.6f);
+            glut.glutSolidSphere(0.09f, 20, 10);
+            gl.glPopMatrix();
+            
+            //LeftFont Leg
+            //Upper Leg
+            gl.glPushMatrix();
+            gl.glTranslatef(posX+0.75f, posY+0.2f, posZ+0.7f);
+            gl.glRotatef(20f,0f,1f,0f);
+            gl.glScalef(0.08f, 0.08f, 2f);
+            glut.glutSolidCube(1f);
+            gl.glPopMatrix();
+            
+            //Bottom Leg
+            gl.glPushMatrix();
+            gl.glTranslatef(posX+1.5f, posY+0.2f, posZ+0.2f);
+            gl.glRotatef(-15f,0f,1f,0f);
+            gl.glScalef(0.08f, 0.08f, 3f);
+            glut.glutSolidCube(1f);
+            gl.glPopMatrix();
+            
+            //Upper and Bottom Leg joint
+            gl.glPushMatrix();
+            gl.glTranslatef(posX+1.1f, posY+0.2f, posZ+1.6f);
+            glut.glutSolidSphere(0.09f, 20, 10);
+            gl.glPopMatrix();
+            
+            //RightFont Leg
+            //Upper Leg
+            gl.glPushMatrix();
+            gl.glTranslatef(posX-0.75f, posY+0.2f, posZ+0.7f);
+            gl.glRotatef(-20f,0f,1f,0f);
+            gl.glScalef(0.08f, 0.08f, 2f);
+            glut.glutSolidCube(1f);
+            gl.glPopMatrix();
+            
+            //Bottom Leg
+            gl.glPushMatrix();
+            gl.glTranslatef(posX-1.5f, posY+0.2f, posZ+0.2f);
+            gl.glRotatef(15f,0f,1f,0f);
+            gl.glScalef(0.08f, 0.08f, 3f);
+            glut.glutSolidCube(1f);
+            gl.glPopMatrix();
+            
+            //Upper and Bottom Leg joint
+            gl.glPushMatrix();
+            gl.glTranslatef(posX-1.1f, posY+0.2f, posZ+1.6f);
+            glut.glutSolidSphere(0.09f, 20, 10);
+            gl.glPopMatrix();
+            
+            //RightFont Leg
+            //Upper Leg
+            gl.glPushMatrix();
+            gl.glTranslatef(posX-0.75f, posY+-0.7f, posZ+0.7f);
+            gl.glRotatef(-20f,0f,1f,0f);
+            gl.glScalef(0.08f, 0.08f, 2f);
+            glut.glutSolidCube(1f);
+            gl.glPopMatrix();
+            
+            //Bottom Leg
+            gl.glPushMatrix();
+            gl.glTranslatef(posX-1.5f, posY+-0.7f, posZ+0.2f);
+            gl.glRotatef(15f,0f,1f,0f);
+            gl.glScalef(0.08f, 0.08f, 3f);
+            glut.glutSolidCube(1f);
+            gl.glPopMatrix();
+            
+            //Upper and Bottom Leg joint
+            gl.glPushMatrix();
+            gl.glTranslatef(posX-1.1f, posY+-0.7f, posZ+1.6f);
+            glut.glutSolidSphere(0.09f, 20, 10);
+            gl.glPopMatrix();
+            
+            //Arms
+            //Left Arm
+            //Upper Arm
+            gl.glPushMatrix();
+            gl.glTranslatef(posX+0.5f, posY+1.3f, posZ+0f);
+            gl.glRotatef(-20f,0f,0f,1f);
+            gl.glScalef(0.08f,0.8f, 0.08f);
+            glut.glutSolidCube(1f);
+            gl.glPopMatrix();
+            
+            //Bottom Arm
+            gl.glPushMatrix();
+            gl.glTranslatef(posX+0.53f, posY+1.9f, posZ+0f);
+            gl.glRotatef(25f,0f,0f,1f);
+            gl.glScalef(0.08f, 0.6f, 0.08f);
+            glut.glutSolidCube(1f);
+            gl.glPopMatrix();
+            
+            //Upper and Bottom Arm joint
+            gl.glPushMatrix();
+            gl.glTranslatef(posX+0.63f, posY+1.68f, posZ+0f);
+            glut.glutSolidSphere(0.09f, 20, 10);
+            gl.glPopMatrix();
+            
+             //Left Arm
+            //Upper Arm
+            gl.glPushMatrix();
+            gl.glTranslatef(posX-0.5f, posY+1.3f, posZ+0f);
+            gl.glRotatef(20f,0f,0f,1f);
+            gl.glScalef(0.08f,0.8f, 0.08f);
+            glut.glutSolidCube(1f);
+            gl.glPopMatrix();
+            
+            //Bottom Arm
+            gl.glPushMatrix();
+            gl.glTranslatef(posX-0.53f, posY+1.9f, posZ+0f);
+            gl.glRotatef(-25f,0f,0f,1f);
+            gl.glScalef(0.08f, 0.6f, 0.08f);
+            glut.glutSolidCube(1f);
+            gl.glPopMatrix();
+                     
+            //Upper and Bottom Arm joint
+            gl.glPushMatrix();
+            gl.glTranslatef(posX-0.63f, posY+1.68f, posZ+0f);
+            glut.glutSolidSphere(0.09f, 20, 10);
             gl.glPopMatrix();
         }
     }
