@@ -116,6 +116,16 @@ public class RobotRace extends Base {
         gl.glEnable(GL_TEXTURE_2D);
         gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         gl.glBindTexture(GL_TEXTURE_2D, 0);
+        
+        // Enable lighting
+        gl.glEnable(GL_LIGHTING);
+        gl.glEnable(GL_LIGHT0);
+        gl.glEnable(GL_LIGHT1);
+        gl.glEnable(GL_NORMALIZE);
+        
+        // add ambient light
+        float ambientLight[] = new float[] {0.8f,0.8f,0.8f,0.5f};
+        gl.glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight, 0);
     }
 
     /**
@@ -188,8 +198,10 @@ public class RobotRace extends Base {
             drawAxisFrame();
         }
 
-        // Draw the first robot
-        robots[0].draw(false);
+        // Draw all four robots
+        for (int i = 0; i < robots.length; i++) {
+        robots[i].draw(false);
+        }
 
         // Draw race track
         raceTrack.draw(gs.trackNr);
@@ -291,29 +303,33 @@ public class RobotRace extends Base {
          * like gold.
          */
         GOLD(
-                new float[]{0.8f, 0.8f, 0.8f, 1.0f},
-                new float[]{0.0f, 0.0f, 0.0f, 1.0f}),
+                new float[]{0.75164f, 0.60648f, 0.22648f, 1f },
+                new float[]{0.628281f, 0.555802f, 0.366065f, 1f },
+                new float[]{51.2f }),
         /**
          * Silver material properties. Modify the default values to make it look
          * like silver.
          */
         SILVER(
-                new float[]{0.8f, 0.8f, 0.8f, 1.0f},
-                new float[]{0.0f, 0.0f, 0.0f, 1.0f}),
+                new float[]{0.50754f, 0.50754f, 0.50754f, 1f },
+                new float[]{0.508273f, 0.508273f, 0.508273f, 1f},
+                new float[]{51.2f }),
         /**
          * Wood material properties. Modify the default values to make it look
          * like wood.
          */
         WOOD(
-                new float[]{0.8f, 0.8f, 0.8f, 1.0f},
-                new float[]{0.0f, 0.0f, 0.0f, 1.0f}),
+                new float[]{0.5f,0.3f,0.2f, 1.0f},
+                new float[]{0.4f,0.3f,0.2f, 1.0f},
+                new float[]{3f }),
         /**
          * Orange material properties. Modify the default values to make it look
          * like orange.
          */
         ORANGE(
-                new float[]{0.8f, 0.8f, 0.8f, 1.0f},
-                new float[]{0.0f, 0.0f, 0.0f, 1.0f});
+                new float[]{1f,0.5f,0f, 1.0f},
+                new float[]{1f,0.5f,0f, 1.0f},
+                new float[]{20f });
 
         /**
          * The diffuse RGBA reflectance of the material.
@@ -325,12 +341,17 @@ public class RobotRace extends Base {
          */
         float[] specular;
 
+        
+        // The shininess of the material in RGBA
+        float[] shinyness;
+        
         /**
          * Constructs a new material with diffuse and specular properties.
          */
-        private Material(float[] diffuse, float[] specular) {
+        private Material(float[] diffuse, float[] specular, float[] shinyness) {
             this.diffuse = diffuse;
             this.specular = specular;
+            this.shinyness = shinyness;
         }
     }
 
@@ -362,7 +383,12 @@ public class RobotRace extends Base {
         public void draw(boolean stickFigure) {
             // code goes here ...
             gl.glPushMatrix();
-            gl.glPopMatrix();
+           // gl.glTranslatef(posX, posY, posZ);
+            
+            // set the material properties
+            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, material.diffuse, 0);
+            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, material.specular, 0);
+            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, material.shinyness, 0);
             gl.glColor3f(0.1f, 0.1f, 0.1f);
             
             //Torso
@@ -510,6 +536,7 @@ public class RobotRace extends Base {
             gl.glPushMatrix();
             gl.glTranslatef(posX-0.63f, posY+1.68f, posZ+0f);
             glut.glutSolidSphere(0.09f, 20, 10);
+            gl.glPopMatrix();
             gl.glPopMatrix();
         }
     }
