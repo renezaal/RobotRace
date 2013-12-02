@@ -489,7 +489,7 @@ public class RobotRace extends Base {
             glut.glutSolidSphere(0.09f, 20, 10);
             gl.glPopMatrix();
             
-             //Left Arm
+            //Left Arm
             //Upper Arm
             gl.glPushMatrix();
             gl.glTranslatef(posX-0.5f, posY+1.3f, posZ+0f);
