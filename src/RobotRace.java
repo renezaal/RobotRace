@@ -555,7 +555,7 @@ public class RobotRace extends Base {
            
             //Eye
             gl.glPushMatrix();
-            gl.glTranslatef(0.18f, 1.15f, 0.53f);
+            gl.glTranslatef(0.18f, 1.15f, 0.6f);
             glut.glutSolidSphere(0.06f, 20, 10);
             gl.glPopMatrix();
             
@@ -568,7 +568,7 @@ public class RobotRace extends Base {
             
             //Eye
             gl.glPushMatrix();
-            gl.glTranslatef(-0.18f, 1.15f, 0.53f);
+            gl.glTranslatef(-0.18f, 1.15f, 0.6f);
             glut.glutSolidSphere(0.06f, 20, 10);
             gl.glPopMatrix();
             
