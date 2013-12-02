@@ -71,15 +71,15 @@ public class RobotRace extends Base {
         /* add other parameters that characterize this robot */);
 
         // Initialize robot 1
-        robots[1] = new Robot(Material.SILVER, 3 , 4, 0
+        robots[1] = new Robot(Material.SILVER, 0, 4, 0
         /* add other parameters that characterize this robot */);
 
         // Initialize robot 2
-        robots[2] = new Robot(Material.WOOD, 2 , 3, 0
+        robots[2] = new Robot(Material.WOOD, 4, 0, 0
         /* add other parameters that characterize this robot */);
 
         // Initialize robot 3
-        robots[3] = new Robot(Material.ORANGE, 1, 3, 0
+        robots[3] = new Robot(Material.ORANGE, 4, 4, 0
         /* add other parameters that characterize this robot */);
 
         // Initialize the camera
@@ -116,15 +116,15 @@ public class RobotRace extends Base {
         gl.glEnable(GL_TEXTURE_2D);
         gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         gl.glBindTexture(GL_TEXTURE_2D, 0);
-        
+
         // Enable lighting
         gl.glEnable(GL_LIGHTING);
         gl.glEnable(GL_LIGHT0);
         gl.glEnable(GL_LIGHT1);
         gl.glEnable(GL_NORMALIZE);
-        
+
         // add ambient light
-        float ambientLight[] = new float[] {0.8f,0.8f,0.8f,0.5f};
+        float ambientLight[] = new float[]{0.8f, 0.8f, 0.8f, 0.5f};
         gl.glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight, 0);
     }
 
@@ -154,7 +154,7 @@ public class RobotRace extends Base {
         // we need to take half the height first, then later on multiply by two
         // essentially we create a triangle with a 90 degree angle with the vDist 
         // and the upper half of the height
-        float fovY = (float) Math.atan((0.5f * vHeight) / gs.vDist)*2f;
+        float fovY = (float) Math.atan((0.5f * vHeight) / gs.vDist) * 2f;
         fovY = (float) Math.toDegrees(fovY);
 
         // now simply add our calculated values to the method call
@@ -200,7 +200,7 @@ public class RobotRace extends Base {
 
         // Draw all four robots
         for (int i = 0; i < robots.length; i++) {
-        robots[i].draw(false);
+            robots[i].draw(false);
         }
 
         // Draw race track
@@ -303,33 +303,33 @@ public class RobotRace extends Base {
          * like gold.
          */
         GOLD(
-                new float[]{0.75164f, 0.60648f, 0.22648f, 1f },
-                new float[]{0.628281f, 0.555802f, 0.366065f, 1f },
-                new float[]{51.2f }),
+                new float[]{0.75164f, 0.60648f, 0.22648f, 1f},
+                new float[]{0.628281f, 0.555802f, 0.366065f, 1f},
+                new float[]{51.2f}),
         /**
          * Silver material properties. Modify the default values to make it look
          * like silver.
          */
         SILVER(
-                new float[]{0.50754f, 0.50754f, 0.50754f, 1f },
+                new float[]{0.50754f, 0.50754f, 0.50754f, 1f},
                 new float[]{0.508273f, 0.508273f, 0.508273f, 1f},
-                new float[]{51.2f }),
+                new float[]{51.2f}),
         /**
          * Wood material properties. Modify the default values to make it look
          * like wood.
          */
         WOOD(
-                new float[]{0.5f,0.3f,0.2f, 1.0f},
-                new float[]{0.4f,0.3f,0.2f, 1.0f},
-                new float[]{3f }),
+                new float[]{0.227f, 0.13f, 0.065f, 1.0f},
+                new float[]{0.3f, 0.14f, 0.071f, 1.0f},
+                new float[]{2f}),
         /**
          * Orange material properties. Modify the default values to make it look
          * like orange.
          */
         ORANGE(
-                new float[]{1f,0.5f,0f, 1.0f},
-                new float[]{1f,0.5f,0f, 1.0f},
-                new float[]{20f });
+                new float[]{1f, 0.5f, 0f, 1.0f},
+                new float[]{1f, 0.5f, 0f, 1.0f},
+                new float[]{20f});
 
         /**
          * The diffuse RGBA reflectance of the material.
@@ -341,10 +341,9 @@ public class RobotRace extends Base {
          */
         float[] specular;
 
-        
         // The shininess of the material in RGBA
         float[] shinyness;
-        
+
         /**
          * Constructs a new material with diffuse and specular properties.
          */
@@ -374,7 +373,7 @@ public class RobotRace extends Base {
             this.material = material;
             this.posX = posX;
             this.posY = posY;
-            this.posZ = posZ;    
+            this.posZ = posZ;
         }
 
         /**
@@ -384,61 +383,61 @@ public class RobotRace extends Base {
             // code goes here ...
             gl.glPushMatrix();
             gl.glTranslatef(posX, posY, posZ);
-            
+
             // set the material properties
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, material.diffuse, 0);
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, material.specular, 0);
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, material.shinyness, 0);
             gl.glColor3f(0.1f, 0.1f, 0.1f);
-            
+
             //Torso
-            gl.glPushMatrix();   
+            gl.glPushMatrix();
             gl.glTranslatef(0f, 0f, -0.1f);
-            gl.glScalef(0.6f,1.05f,0.4f);
+            gl.glScalef(0.6f, 1.05f, 0.4f);
             glut.glutSolidSphere(1f, 20, 10);
             gl.glPopMatrix();
-            
+
             //Legs
             //LeftBack Leg
             //Upper Leg
             gl.glPushMatrix();
             gl.glTranslatef(0.65f, -0.7f, 0.7f);
-            gl.glRotatef(20f,0f,1f,0f);
+            gl.glRotatef(20f, 0f, 1f, 0f);
             gl.glScalef(0.10f, 0.10f, 2f);
             glut.glutSolidCube(1f);
             gl.glPopMatrix();
-            
+
             //Bottom Leg
             gl.glPushMatrix();
             gl.glTranslatef(1.0f, -0.7f, 1.6f);
-            gl.glRotatef(165f,0f,1f,0f);
+            gl.glRotatef(165f, 0f, 1f, 0f);
             gl.glScalef(0.08f, 0.08f, 3f);
             glut.glutSolidCone(1f, 1f, 10, 10);
             gl.glPopMatrix();
-            
+
             //Upper and Bottom Leg joint
             gl.glPushMatrix();
             gl.glTranslatef(1.0f, -0.7f, 1.58f);
             glut.glutSolidSphere(0.12f, 20, 10);
             gl.glPopMatrix();
-            
+
             //LeftFont Leg
             //Upper Leg
             gl.glPushMatrix();
             gl.glTranslatef(0.65f, 0.2f, 0.7f);
-            gl.glRotatef(20f,0f,1f,0f);
+            gl.glRotatef(20f, 0f, 1f, 0f);
             gl.glScalef(0.10f, 0.10f, 2f);
             glut.glutSolidCube(1f);
             gl.glPopMatrix();
-            
+
             //Bottom Leg
             gl.glPushMatrix();
             gl.glTranslatef(1.0f, 0.2f, 1.6f);
-            gl.glRotatef(165f,0f,1f,0f);
+            gl.glRotatef(165f, 0f, 1f, 0f);
             gl.glScalef(0.08f, 0.08f, 3f);
             glut.glutSolidCone(1f, 1f, 10, 10);
             gl.glPopMatrix();
-            
+
             //Upper and Bottom Leg joint
             gl.glPushMatrix();
             gl.glTranslatef(1.0f, 0.2f, 1.58f);
@@ -449,89 +448,89 @@ public class RobotRace extends Base {
             //Upper Leg
             gl.glPushMatrix();
             gl.glTranslatef(-0.65f, 0.2f, 0.7f);
-            gl.glRotatef(-20f,0f,1f,0f);
+            gl.glRotatef(-20f, 0f, 1f, 0f);
             gl.glScalef(0.10f, 0.10f, 2f);
             glut.glutSolidCube(1f);
             gl.glPopMatrix();
-            
+
             //Bottom Leg
             gl.glPushMatrix();
             gl.glTranslatef(-1.0f, 0.2f, 1.6f);
-            gl.glRotatef(195f,0f,1f,0f);
+            gl.glRotatef(195f, 0f, 1f, 0f);
             gl.glScalef(0.08f, 0.08f, 3f);
             glut.glutSolidCone(1f, 1f, 10, 10);
             gl.glPopMatrix();
-                    
+
             //Upper and Bottom Leg joint
             gl.glPushMatrix();
             gl.glTranslatef(-1.0f, 0.2f, 1.58f);
             glut.glutSolidSphere(0.12f, 20, 10);
             gl.glPopMatrix();
-            
+
             //RightFont Leg
             //Upper Leg
             gl.glPushMatrix();
             gl.glTranslatef(-0.65f, -0.7f, 0.7f);
-            gl.glRotatef(-20f,0f,1f,0f);
+            gl.glRotatef(-20f, 0f, 1f, 0f);
             gl.glScalef(0.10f, 0.10f, 2f);
             glut.glutSolidCube(1f);
             gl.glPopMatrix();
-            
+
             //Bottom Leg
             gl.glPushMatrix();
             gl.glTranslatef(-1.0f, -0.7f, 1.6f);
-            gl.glRotatef(195f,0f,1f,0f);
+            gl.glRotatef(195f, 0f, 1f, 0f);
             gl.glScalef(0.08f, 0.08f, 3f);
             glut.glutSolidCone(1f, 1f, 10, 10);
             gl.glPopMatrix();
-            
+
             //Upper and Bottom Leg joint
             gl.glPushMatrix();
             gl.glTranslatef(-1.0f, -0.7f, 1.58f);
             glut.glutSolidSphere(0.12f, 20, 10);
             gl.glPopMatrix();
-            
+
             //Arms
             //Left Arm
             //Upper Arm
             gl.glPushMatrix();
             gl.glTranslatef(0.5f, 1.3f, 0f);
-            gl.glRotatef(-20f,0f,0f,1f);
-            gl.glScalef(0.08f,0.8f, 0.08f);
+            gl.glRotatef(-20f, 0f, 0f, 1f);
+            gl.glScalef(0.08f, 0.8f, 0.08f);
             glut.glutSolidCube(1f);
             gl.glPopMatrix();
-            
+
             //Bottom Arm
             gl.glPushMatrix();
             gl.glTranslatef(0.53f, 1.9f, 0f);
-            gl.glRotatef(25f,0f,0f,1f);
+            gl.glRotatef(25f, 0f, 0f, 1f);
             gl.glScalef(0.08f, 0.6f, 0.08f);
             glut.glutSolidCube(1f);
             gl.glPopMatrix();
-            
+
             //Upper and Bottom Arm joint
             gl.glPushMatrix();
             gl.glTranslatef(0.63f, 1.68f, 0f);
             glut.glutSolidSphere(0.09f, 20, 10);
             gl.glPopMatrix();
-            
+
             //Left Arm
             //Upper Arm
             gl.glPushMatrix();
             gl.glTranslatef(-0.5f, 1.3f, 0f);
-            gl.glRotatef(20f,0f,0f,1f);
-            gl.glScalef(0.08f,0.8f, 0.08f);
+            gl.glRotatef(20f, 0f, 0f, 1f);
+            gl.glScalef(0.08f, 0.8f, 0.08f);
             glut.glutSolidCube(1f);
             gl.glPopMatrix();
-            
+
             //Bottom Arm
             gl.glPushMatrix();
             gl.glTranslatef(-0.53f, 1.9f, 0f);
-            gl.glRotatef(-25f,0f,0f,1f);
+            gl.glRotatef(-25f, 0f, 0f, 1f);
             gl.glScalef(0.08f, 0.6f, 0.08f);
             glut.glutSolidCube(1f);
             gl.glPopMatrix();
-                     
+
             //Upper and Bottom Arm joint
             gl.glPushMatrix();
             gl.glTranslatef(-0.63f, 1.68f, 0f);
@@ -567,6 +566,36 @@ public class RobotRace extends Base {
          */
         public void update(int mode) {
             robots[0].toString();
+
+            // draw a light above and to the left of the camera
+            // calculate the direction in which the camera looks in the xy plane 
+            Vector xyCameraDir = (new Vector(eye.subtract(center).x(), eye.subtract(center).y(), 0)).normalized();
+
+            // take the cross product of that vector with the up vector to get a vector orthogonal to the direction vector in the xyplane
+            Vector light1 = xyCameraDir.cross(up).normalized();
+
+            // now we can look correct the vector if it points to the right instead of to the left
+            // this part is only easy to explain when you visualize it on paper
+            // basically we compare the x coordinates to find out whether light1 is pointing to the left or right
+            // a switch happens at y=-x
+            if (xyCameraDir.y() > -xyCameraDir.x()) {
+                if (light1.x() > xyCameraDir.x()) {
+                    light1 = Vector.O.subtract(light1);
+                }
+            } else if (xyCameraDir.y() < -xyCameraDir.x()) {
+                if (light1.x() < xyCameraDir.x()) {
+                    light1 = Vector.O.subtract(light1);
+                }
+            } else if (light1.x() != xyCameraDir.x()) {
+                    light1 = Vector.O.subtract(light1);
+            }
+
+            light1= light1.add(eye);
+            
+            float light1co[] = new float[] {(float) light1.x(),(float)light1.y(),(float)light1.z(),1.0f};
+            
+            // activate the spot
+            gl.glLightfv(GL_LIGHT1, GL_POSITION, light1co, 0);
 
             // Helicopter mode
             if (1 == mode) {
