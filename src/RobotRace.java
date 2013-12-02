@@ -494,48 +494,84 @@ public class RobotRace extends Base {
             //Left Arm
             //Upper Arm
             gl.glPushMatrix();
-            gl.glTranslatef(0.5f, 1.3f, 0f);
-            gl.glRotatef(-20f, 0f, 0f, 1f);
-            gl.glScalef(0.08f, 0.8f, 0.08f);
-            glut.glutSolidCube(1f);
-            gl.glPopMatrix();
-
-            //Bottom Arm
-            gl.glPushMatrix();
-            gl.glTranslatef(0.53f, 1.9f, 0f);
-            gl.glRotatef(25f, 0f, 0f, 1f);
-            gl.glScalef(0.08f, 0.6f, 0.08f);
-            glut.glutSolidCube(1f);
-            gl.glPopMatrix();
-
-            //Upper and Bottom Arm joint
-            gl.glPushMatrix();
-            gl.glTranslatef(0.63f, 1.68f, 0f);
-            glut.glutSolidSphere(0.09f, 20, 10);
-            gl.glPopMatrix();
-
-            //Left Arm
-            //Upper Arm
-            gl.glPushMatrix();
-            gl.glTranslatef(-0.5f, 1.3f, 0f);
-            gl.glRotatef(20f, 0f, 0f, 1f);
-            gl.glScalef(0.08f, 0.8f, 0.08f);
-            glut.glutSolidCube(1f);
-            gl.glPopMatrix();
-
-            //Bottom Arm
-            gl.glPushMatrix();
-            gl.glTranslatef(-0.53f, 1.9f, 0f);
+            gl.glTranslatef(0.45f, 1f, -0.15f);
             gl.glRotatef(-25f, 0f, 0f, 1f);
             gl.glScalef(0.08f, 0.6f, 0.08f);
             glut.glutSolidCube(1f);
             gl.glPopMatrix();
 
+            //Bottom Arm
+            gl.glPushMatrix();
+            gl.glTranslatef(0.58f, 1.35f, -0.15f);
+            gl.glRotatef(90f, 0f, 1f, 0f);
+            gl.glRotatef(-105f, 1f, 0f, 0f);
+            gl.glScalef(0.06f, 0.06f, 0.8f);
+            glut.glutSolidCone(1f, 1f, 10, 10);
+            gl.glPopMatrix();
+
             //Upper and Bottom Arm joint
             gl.glPushMatrix();
-            gl.glTranslatef(-0.63f, 1.68f, 0f);
-            glut.glutSolidSphere(0.09f, 20, 10);
+            gl.glTranslatef(0.58f, 1.3f, -0.15f);
+            glut.glutSolidSphere(0.10f, 20, 10);
             gl.glPopMatrix();
+
+            //Left Arm
+            //Upper Arm
+            gl.glPushMatrix();
+            gl.glTranslatef(-0.45f, 1f, -0.15f);
+            gl.glRotatef(25f, 0f, 0f, 1f);
+            gl.glScalef(0.08f, 0.6f, 0.08f);
+            glut.glutSolidCube(1f);
+            gl.glPopMatrix();
+
+            //Bottom Arm
+            gl.glPushMatrix();
+            gl.glTranslatef(-0.58f, 1.35f, -0.15f);
+            gl.glRotatef(90f, 0f, 1f, 0f);
+            gl.glRotatef(-75f, 1f, 0f, 0f);
+            gl.glScalef(0.06f, 0.06f, 0.8f);
+            glut.glutSolidCone(1f, 1f, 10, 10);
+            gl.glPopMatrix();
+
+            //Upper and Bottom Arm joint
+            gl.glPushMatrix();
+            gl.glTranslatef(-0.58f, 1.3f, -0.15f);
+            glut.glutSolidSphere(0.10f, 20, 10);
+            gl.glPopMatrix();
+            
+            //Head
+            gl.glPushMatrix();
+            gl.glTranslatef(0f, 0.9f, 0.2f);
+            gl.glScalef(0.35f, 0.55f, 0.3f);
+            glut.glutSolidSphere(1f, 20, 10);
+            gl.glPopMatrix();
+            
+            //Left Eye
+            //Eye Container
+            gl.glPushMatrix();
+            gl.glTranslatef(0.18f, 1.15f, 0.28f);
+            glut.glutSolidCylinder(0.07f, 0.15f, 10, 10);
+            gl.glPopMatrix();
+           
+            //Eye
+            gl.glPushMatrix();
+            gl.glTranslatef(0.18f, 1.15f, 0.53f);
+            glut.glutSolidSphere(0.06f, 20, 10);
+            gl.glPopMatrix();
+            
+            //Right Eye
+            //Eye Container
+            gl.glPushMatrix();
+            gl.glTranslatef(-0.18f, 1.15f, 0.28f);
+            glut.glutSolidCylinder(0.07f, 0.15f, 10, 10);
+            gl.glPopMatrix();
+            
+            //Eye
+            gl.glPushMatrix();
+            gl.glTranslatef(-0.18f, 1.15f, 0.53f);
+            glut.glutSolidSphere(0.06f, 20, 10);
+            gl.glPopMatrix();
+            
             gl.glPopMatrix();
         }
     }
