@@ -1,6 +1,9 @@
 
+import com.jogamp.opengl.util.gl2.GLUT;
 import javax.media.opengl.GL;
+import javax.media.opengl.GL2;
 import static javax.media.opengl.GL2.*;
+import javax.media.opengl.glu.GLU;
 import robotrace.Base;
 import robotrace.Vector;
 
@@ -37,6 +40,19 @@ import robotrace.Vector;
  */
 public class RobotRace extends Base {
 
+    private CartesianDraw cd = new CartesianDraw(this);
+
+    public GL2 getGL() {
+        return gl;
+    }
+
+    public GLU getGLU() {
+        return glu;
+    }
+
+    public GLUT getGLUT() {
+        return glut;
+    }
     /**
      * Array of the four robots.
      */
@@ -67,20 +83,16 @@ public class RobotRace extends Base {
         robots = new Robot[4];
 
         // Initialize robot 0
-        robots[0] = new Robot(Material.GOLD, 0, 0, 0
-        /* add other parameters that characterize this robot */);
+        robots[0] = new Robot(Material.GOLD, 0, 0, 0,this);
 
         // Initialize robot 1
-        robots[1] = new Robot(Material.SILVER, 0, 4, 0
-        /* add other parameters that characterize this robot */);
+        robots[1] = new Robot(Material.SILVER, 0, 4, 0,this);
 
         // Initialize robot 2
-        robots[2] = new Robot(Material.WOOD, 4, 0, 0
-        /* add other parameters that characterize this robot */);
+        robots[2] = new Robot(Material.WOOD, 4, 0, 0,this);
 
         // Initialize robot 3
-        robots[3] = new Robot(Material.ORANGE, 4, 4, 0
-        /* add other parameters that characterize this robot */);
+        robots[3] = new Robot(Material.ORANGE, 4, 4, 0,this);
 
         // Initialize the camera
         camera = new Camera();
@@ -231,11 +243,11 @@ public class RobotRace extends Base {
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Material.RED.diffuse, 0);
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.RED.specular, 0);
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, Material.RED.shinyness, 0);
-            cartesianRectangle(2f, 0, 0, 0.1f);
+            cd.Rectangle(2f, 0, 0, 0.1f);
 
             // draw a cone at the end
             gl.glPushMatrix();
-            cartesianTransform(2f, 0f, 0f, 2.12f, 0f, 0f, 0.12f);
+            cd.Transform(2f, 0f, 0f, 2.12f, 0f, 0f, 0.12f);
             glut.glutSolidCone(1f, 1.5f, 10, 10);
             gl.glPopMatrix();
 
@@ -243,11 +255,11 @@ public class RobotRace extends Base {
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Material.GREEN.diffuse, 0);
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.GREEN.specular, 0);
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, Material.GREEN.shinyness, 0);
-            cartesianRectangle(0, 2f, 0, 0.1f);
+            cd.Rectangle(0, 2f, 0, 0.1f);
 
             // draw a cone at the end
             gl.glPushMatrix();
-            cartesianTransform(0f, 2f, 0f, 0f, 2.12f, 0f, 0.12f);
+            cd.Transform(0f, 2f, 0f, 0f, 2.12f, 0f, 0.12f);
             glut.glutSolidCone(1f, 1.5f, 10, 10);
             gl.glPopMatrix();
 
@@ -255,11 +267,11 @@ public class RobotRace extends Base {
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Material.BLUE.diffuse, 0);
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.BLUE.specular, 0);
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, Material.BLUE.shinyness, 0);
-            cartesianRectangle(0, 0, 2f, 0.1f);
+            cd.Rectangle(0, 0, 2f, 0.1f);
 
             // draw a cone at the end
             gl.glPushMatrix();
-            cartesianTransform(0f, 0f, 2f, 0f, 0f, 2.12f, 0.12f);
+            cd.Transform(0f, 0f, 2f, 0f, 0f, 2.12f, 0.12f);
             glut.glutSolidCone(1f, 1.5f, 10, 10);
             gl.glPopMatrix();
 
@@ -309,14 +321,14 @@ public class RobotRace extends Base {
                 new float[]{1f, 0.5f, 0f, 1.0f},
                 new float[]{20f}),
         /**
-         *Yellow material properties.
+         * Yellow material properties.
          */
         YELLOW(
                 new float[]{0f, 1f, 1f, 1.0f},
                 new float[]{0f, 1f, 1f, 1.0f},
                 new float[]{20f}),
         /**
-         *Blue material properties.
+         * Blue material properties.
          */
         BLUE(
                 new float[]{0f, 0f, 1f, 1.0f},
@@ -329,9 +341,8 @@ public class RobotRace extends Base {
                 new float[]{0f, 1f, 0f, 1.0f},
                 new float[]{0f, 1f, 0f, 1.0f},
                 new float[]{20f}),
-
-         /* 
-        *Red material properties
+        /* 
+         *Red material properties
          */
         RED(
                 new float[]{1f, 0f, 0f, 1.0f},
@@ -370,24 +381,30 @@ public class RobotRace extends Base {
          */
         private final Material material;
         private float posX, posY, posZ;
+        private RobotLeg[] legs = new RobotLeg[4];
 
         /**
          * Constructs the robot with initial parameters.
          */
-        public Robot(Material material, float posX, float posY, float posZ) {
+        public Robot(Material material, float posX, float posY, float posZ,RobotRace rr) {
             this.material = material;
             this.posX = posX;
             this.posY = posY;
             this.posZ = posZ;
+
+            legs[0] = new RobotLeg(rr, cd, false, true, -0.4f, -0.6f, 0);
+            legs[1] = new RobotLeg(rr, cd, true, true, -0.4f, 0.2f, 0);
+            legs[2] = new RobotLeg(rr, cd, false, false, 0.4f, -0.6f, 0);
+            legs[3] = new RobotLeg(rr, cd, true, false, 0.4f, 0.2f, 0);
         }
 
         /**
          * Draws this robot (as a {@code stickfigure} if specified).
          */
         public void draw(boolean stickFigure) {
-           float dGround = 1.2f;
+            float dGround = 1.2f;
             gl.glPushMatrix();
-            gl.glTranslatef(posX, posY, posZ+dGround);
+            gl.glTranslatef(posX, posY, posZ + dGround);
 
             // set the material properties
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, material.diffuse, 0);
@@ -403,29 +420,9 @@ public class RobotRace extends Base {
             gl.glPopMatrix();
 
             //Legs
-            //LeftBack Leg
-            gl.glPushMatrix();
-            gl.glTranslatef(-0.4f, -0.6f,0);
-            drawLeg(true,false,dGround);
-            gl.glPopMatrix();
-
-            //LeftFront Leg
-            gl.glPushMatrix();
-            gl.glTranslatef(-0.4f, 0.2f,0);
-            drawLeg(true,true,dGround);
-            gl.glPopMatrix();
-
-            //RightBack Leg
-            gl.glPushMatrix();
-            gl.glTranslatef(0.4f, -0.6f, 0);
-            drawLeg(false,false,dGround);
-            gl.glPopMatrix();
-
-            //RightFront Leg
-            gl.glPushMatrix();
-            gl.glTranslatef(0.4f, 0.2f, 0);
-            drawLeg(false,true,dGround);
-            gl.glPopMatrix();
+            for (RobotLeg leg : legs) {
+                leg.DrawLeg(dGround);
+            }
 
             //Arms
             //Left Arm
@@ -475,114 +472,44 @@ public class RobotRace extends Base {
             gl.glTranslatef(-0.58f, 1.3f, -0.15f);
             glut.glutSolidSphere(0.10f, 20, 10);
             gl.glPopMatrix();
-            
+
             //Head
             gl.glPushMatrix();
             gl.glTranslatef(0f, 0.9f, 0.2f);
             gl.glScalef(0.35f, 0.55f, 0.3f);
             glut.glutSolidSphere(1f, 20, 10);
             gl.glPopMatrix();
-            
+
             //Left Eye
             //Eye Container
             gl.glPushMatrix();
             gl.glTranslatef(0.18f, 1.15f, 0.28f);
             glut.glutSolidCylinder(0.07f, 0.15f, 10, 10);
             gl.glPopMatrix();
-           
+
             //Eye
             gl.glPushMatrix();
             gl.glTranslatef(0.18f, 1.15f, 0.6f);
             glut.glutSolidSphere(0.06f, 20, 10);
             gl.glPopMatrix();
-            
+
             //Right Eye
             //Eye Container
             gl.glPushMatrix();
             gl.glTranslatef(-0.18f, 1.15f, 0.28f);
             glut.glutSolidCylinder(0.07f, 0.15f, 10, 10);
             gl.glPopMatrix();
-            
+
             //Eye
             gl.glPushMatrix();
             gl.glTranslatef(-0.18f, 1.15f, 0.6f);
             glut.glutSolidSphere(0.06f, 20, 10);
             gl.glPopMatrix();
-            
-            gl.glPopMatrix();
-        }
-        
-        private void drawLeg(Boolean left,Boolean front, float dGround){
-            gl.glPushMatrix();
-            final float kneeXOffset = 0.5f;
-            final float kneeYOffset = 0.3f;
-            float kneeX =left? -kneeXOffset:kneeXOffset;
-            float kneeY=front?kneeYOffset:-kneeYOffset;
-            float kneeZ=1.2f;
-            
-            gl.glPushMatrix();
-            cartesianRectangle(kneeX, kneeY, kneeZ, 0.1f);
-            gl.glPopMatrix();
-            //Bottom Leg
-            gl.glPushMatrix();
-            cartesianTransform(kneeX, kneeY, kneeZ, kneeX*2, kneeY*2, -dGround, 0.1f);
-            glut.glutSolidCone(1f, 1f, 10, 10);
+
             gl.glPopMatrix();
 
-            //Upper and Bottom Leg joint
-            gl.glPushMatrix();
-            gl.glTranslatef(kneeX, kneeY, kneeZ*0.95f);
-            glut.glutSolidSphere(0.15f, 20, 10);
-            gl.glPopMatrix();
-            gl.glPopMatrix();
         }
-    }
-    
-    public enum Shape{
-    Cone{},
-    Square{},
-    Orb{},
-    Triangle{}
-;
-        private Shape() {
-        }
-}
-    
-    private void cartesianRectangle(float x2,float y2,float z2,float radius){
-        cartesianRectangle(0, 0, 0, x2, y2, z2, radius);
-    }
-    private void cartesianRectangle(float x1,float y1,float z1,float x2,float y2,float z2,float radius){
-        gl.glPushMatrix();
-        gl.glTranslatef((x2-x1)/2, (y2-y1)/2, (z2-z1)/2);
-        cartesianTransform(x1, y1, z1, x2, y2, z2, radius);
-        glut.glutSolidCube(1f);
-        gl.glPopMatrix();
-    }
-    
-    private void cartesianTransform(float x2,float y2,float z2,float radius){
-        cartesianTransform(0, 0, 0, x2, y2, z2, radius);
-    }
-    private void cartesianTransform(float x1,float y1,float z1,float x2,float y2,float z2,float radius){
-        
-        gl.glTranslatef(x1, y1, z1);
-        
-        float x3 = x2-x1;
-        float y3=y2-y1;
-        float z3=z2-z1;
-        
-        float length = (float)Math.sqrt(x3*x3+y3*y3+z3*z3);
-        if (length == 0) {
-            gl.glScalef(0, 0, 0);
-            return;
-        }
-        
-        float phi = (float)Math.toDegrees(Math.atan2(y3,x3));
-        float theta =(float)Math.toDegrees( Math.acos(z3/length));
-        
-        gl.glRotatef(phi, 0, 0, 1f);
-        gl.glRotatef(theta, 0, 1f, 0);
-        
-        gl.glScalef(radius, radius, length);
+
     }
 
     /**
@@ -632,13 +559,13 @@ public class RobotRace extends Base {
                     light1 = Vector.O.subtract(light1);
                 }
             } else if (light1.x() != xyCameraDir.x()) {
-                    light1 = Vector.O.subtract(light1);
+                light1 = Vector.O.subtract(light1);
             }
 
-            light1= light1.add(eye);
-            
-            float light1co[] = new float[] {(float) light1.x(),(float)light1.y(),(float)light1.z(),1.0f};
-            
+            light1 = light1.add(eye);
+
+            float light1co[] = new float[]{(float) light1.x(), (float) light1.y(), (float) light1.z(), 1.0f};
+
             // activate the spot
             gl.glLightfv(GL_LIGHT1, GL_POSITION, light1co, 0);
 
@@ -662,14 +589,13 @@ public class RobotRace extends Base {
             } else {
                 setDefaultMode();
             }
-            
-            
-        glu.gluLookAt(
-                gs.vDist * Math.cos(gs.phi) * Math.sin(gs.theta) + gs.cnt.x() // X-camera
-                , gs.vDist * Math.cos(gs.phi) * Math.cos(gs.theta) + gs.cnt.y() // Y-camera
-                , gs.vDist * Math.sin(gs.phi) + gs.cnt.z(), // Z-camera
-                gs.cnt.x(), gs.cnt.y(), gs.cnt.z(),
-                0, 0, 1);
+
+            glu.gluLookAt(
+                    gs.vDist * Math.cos(gs.phi) * Math.sin(gs.theta) + gs.cnt.x() // X-camera
+                    , gs.vDist * Math.cos(gs.phi) * Math.cos(gs.theta) + gs.cnt.y() // Y-camera
+                    , gs.vDist * Math.sin(gs.phi) + gs.cnt.z(), // Z-camera
+                    gs.cnt.x(), gs.cnt.y(), gs.cnt.z(),
+                    0, 0, 1);
         }
 
         /**
