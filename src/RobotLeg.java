@@ -44,27 +44,21 @@ public class RobotLeg {
     pre();
     
         gl.glPushMatrix();
-        gl.glTranslatef(x, y, z);
-        final float kneeXOffset = 0.5f;
-        final float kneeYOffset = 0.3f;
-        float kneeX = left ? -kneeXOffset : kneeXOffset;
-        float kneeY = front ? kneeYOffset : -kneeYOffset;
-        float kneeZ = 1.2f;
+        float footX = (left ? -0.6f : 0.6f)+x;
+        float footY = (front ? 1f : -1f)+y;
+        float footZ = (-dGround)+z;
 
-        gl.glPushMatrix();
-        cd.Rectangle(kneeX, kneeY, kneeZ, 0.1f);
-        gl.glPopMatrix();
-        //Bottom Leg
-        gl.glPushMatrix();
-        cd.Transform(kneeX, kneeY, kneeZ, kneeX * 2, kneeY * 2, -dGround, 0.1f);
-        glut.glutSolidCone(1f, 1f, 10, 10);
-        gl.glPopMatrix();
-
-        //Upper and Bottom Leg joint
-        gl.glPushMatrix();
-        gl.glTranslatef(kneeX, kneeY, kneeZ * 0.95f);
-        glut.glutSolidSphere(0.15f, 20, 10);
-        gl.glPopMatrix();
+        // joint start and end points
+        cd.Joint(x, y, z, footX, footY, footZ, 
+                // length of the first and second limbs
+                1.3f, 2.3f, 
+                // direction of the knee
+                Vector.Z, 
+                // shapes of the first limb, knee, second limb
+                CartesianDraw.Shape.Cylinder, CartesianDraw.Shape.Sphere, CartesianDraw.Shape.Cone, 
+                // radius and detail level
+                0.14f, 10);
+        
         gl.glPopMatrix();
     }
 }
