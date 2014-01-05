@@ -83,16 +83,16 @@ public class RobotRace extends Base {
         robots = new Robot[4];
 
         // Initialize robot 0
-        robots[0] = new Robot(Material.GOLD, 0, 0, 0,this);
+        robots[0] = new Robot(Material.GOLD, 0, 0, 0, this);
 
         // Initialize robot 1
-        robots[1] = new Robot(Material.SILVER, 0, 4, 0,this);
+        robots[1] = new Robot(Material.SILVER, 0, 4, 0, this);
 
         // Initialize robot 2
-        robots[2] = new Robot(Material.WOOD, 4, 0, 0,this);
+        robots[2] = new Robot(Material.WOOD, 4, 0, 0, this);
 
         // Initialize robot 3
-        robots[3] = new Robot(Material.ORANGE, 4, 4, 0,this);
+        robots[3] = new Robot(Material.ORANGE, 4, 4, 0, this);
 
         // Initialize the camera
         camera = new Camera();
@@ -382,11 +382,12 @@ public class RobotRace extends Base {
         private final Material material;
         private float posX, posY, posZ;
         private RobotLeg[] legs = new RobotLeg[4];
+        private RobotEye[] eyes = new RobotEye[2];
 
         /**
          * Constructs the robot with initial parameters.
          */
-        public Robot(Material material, float posX, float posY, float posZ,RobotRace rr) {
+        public Robot(Material material, float posX, float posY, float posZ, RobotRace rr) {
             this.material = material;
             this.posX = posX;
             this.posY = posY;
@@ -396,6 +397,9 @@ public class RobotRace extends Base {
             legs[1] = new RobotLeg(rr, cd, true, true, -0.4f, 0.2f, 0);
             legs[2] = new RobotLeg(rr, cd, false, false, 0.4f, -0.6f, 0);
             legs[3] = new RobotLeg(rr, cd, true, false, 0.4f, 0.2f, 0);
+            
+            eyes[0]=new RobotEye(rr, cd);
+            eyes[1]=new RobotEye(rr, cd);
         }
 
         /**
@@ -421,7 +425,7 @@ public class RobotRace extends Base {
 
             //Legs
             for (RobotLeg leg : legs) {
-                leg.DrawLeg(dGround);
+                leg.Draw(dGround);
             }
 
             //Arms
@@ -490,7 +494,7 @@ public class RobotRace extends Base {
             //Eye
             gl.glPushMatrix();
             gl.glTranslatef(0.18f, 1.15f, 0.6f);
-            glut.glutSolidSphere(0.06f, 20, 10);
+            eyes[0].Draw();
             gl.glPopMatrix();
 
             //Right Eye
@@ -503,7 +507,7 @@ public class RobotRace extends Base {
             //Eye
             gl.glPushMatrix();
             gl.glTranslatef(-0.18f, 1.15f, 0.6f);
-            glut.glutSolidSphere(0.06f, 20, 10);
+            eyes[1].Draw();
             gl.glPopMatrix();
 
             gl.glPopMatrix();

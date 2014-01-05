@@ -94,10 +94,10 @@ public class RobotLeg {
         }
 
         // draw the entire leg
-        drawLeg(dGround, foot);
+        draw(dGround, foot);
     }
 
-    private void drawLeg(float dGround, Vector foot) {
+    private void draw(float dGround, Vector foot) {
         pre();
 
         Vector neutral = new Vector(0.6, front ? 1 : -1, -dGround);
@@ -122,7 +122,7 @@ public class RobotLeg {
         gl.glPopMatrix();
     }
 
-    public void DrawLeg(float dGround) {
+    public void Draw(float dGround) {
         Advance(dGround, 0.1f);
     }
 }
