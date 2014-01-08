@@ -50,11 +50,10 @@ public class RobotLeg {
         glut = rr.getGLUT();
     }
 
-    public void Advance(float dGround, float amount) {
+    public void Advance(float dGround, double amount) {
         Vector foot;
         Date newTime = new Date();
         double timeLapsed = ((double) (newTime.getTime() - time.getTime())) * 0.01;
-        //double timeLapsed = (double) amount*3f;
         time = newTime;
         // regulate the loop
         if (onTheGround) {
@@ -123,6 +122,6 @@ public class RobotLeg {
     }
 
     public void Draw(float dGround) {
-        Advance(dGround, 0.1f);
+        Advance(dGround, 0.1);
     }
 }

@@ -1,5 +1,6 @@
 
 import com.jogamp.opengl.util.gl2.GLUT;
+import java.util.Date;
 import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import static javax.media.opengl.GL2.*;
@@ -83,16 +84,16 @@ public class RobotRace extends Base {
         robots = new Robot[4];
 
         // Initialize robot 0
-        robots[0] = new Robot(Material.GOLD, 0, 0, 0, this);
+        robots[0] = new Robot(Material.GOLD, 0, 0, 0, new Vector(0, 1, 0),this);
 
-        // Initialize robot 1
-        robots[1] = new Robot(Material.SILVER, 0, 4, 0, this);
-
-        // Initialize robot 2
-        robots[2] = new Robot(Material.WOOD, 4, 0, 0, this);
-
-        // Initialize robot 3
-        robots[3] = new Robot(Material.ORANGE, 4, 4, 0, this);
+//        // Initialize robot 1
+//        robots[1] = new Robot(Material.SILVER, 0, 4, 0, this);
+//
+//        // Initialize robot 2
+//        robots[2] = new Robot(Material.WOOD, 4, 0, 0, this);
+//
+//        // Initialize robot 3
+//        robots[3] = new Robot(Material.ORANGE, 4, 4, 0, this);
 
         // Initialize the camera
         camera = new Camera();
@@ -179,12 +180,45 @@ public class RobotRace extends Base {
         // Update the view according to the camera mode
         camera.update(gs.camMode);
     }
+    
+    // variable for storing the last time a draw was called
+    private Date time = new Date();
+    
+    // variable for storing the time between draws
+private double timePassed=1;
 
+// variable for keeping track of loops, is reset at 600 seconds/10 minutes
+private double loop=0;
+
+// gets the time between this draw and the previous one
+public double timePassed(){
+    return timePassed;
+}
+// calculates the time that passed since the last time this method was called
+    private void newTime(){
+        // new time that is current
+        Date newTime = new Date();
+        
+        // difference between the already existing time and the new one
+        long difference = newTime.getTime()-time.getTime();
+        
+        // difference expressed as fractional seconds
+        timePassed=((double)difference)/1000.0;
+        
+        // updates the loop
+        loop=(loop+timePassed)%600;
+        
+        // set the time to the current one
+        time=newTime;
+    }
     /**
      * Draws the entire scene.
      */
     @Override
     public void drawScene() {
+        // update the measured time between draws
+        newTime();
+        
         // Background color.
         gl.glClearColor(1f, 1f, 1f, 0f);
 
@@ -203,11 +237,19 @@ public class RobotRace extends Base {
         if (gs.showAxes) {
             drawAxisFrame();
         }
-
-        // Draw all four robots
-        for (int i = 0; i < robots.length; i++) {
-            robots[i].draw(false);
-        }
+        
+       double x= Math.sin(loop%(2.0*Math.PI))*10;
+      double y=  Math.cos(loop%(2.0*Math.PI))*5;
+        
+      
+        Vector roboLoc= new Vector(x, y, 0);
+        Vector heading=roboLoc.cross(Vector.Z);
+        
+        robots[0].draw(Vector.O,heading,false);
+//        // Draw all four robots
+//        for (int i = 0; i < robots.length; i++) {
+//            robots[i].draw(false);
+//        }
 
         // Draw race track
         raceTrack.draw(gs.trackNr);
@@ -380,42 +422,87 @@ public class RobotRace extends Base {
          * The material from which this robot is built.
          */
         private final Material material;
+        private Vector pos(){
+            return new Vector(posX, posY, posZ);
+        }
+        private Vector heading(){
+            return heading.normalized();
+        }
+        private Vector rightSide(){
+            return Vector.Z.cross(heading).normalized();
+        }
+        private Vector normal(){
+            return heading.cross(rightSide());
+        }
         private float posX, posY, posZ;
         private RobotLeg[] legs = new RobotLeg[4];
         private RobotEye[] eyes = new RobotEye[2];
-
+        private RobotArm[] arms = new RobotArm[2];
+private Vector heading;
+private float dGround = 1.2f;
         /**
          * Constructs the robot with initial parameters.
          */
-        public Robot(Material material, float posX, float posY, float posZ, RobotRace rr) {
+        public Robot(Material material, float posX, float posY, float posZ, Vector heading, RobotRace rr) {
             this.material = material;
             this.posX = posX;
             this.posY = posY;
             this.posZ = posZ;
+            this.heading=heading.normalized();
 
             legs[0] = new RobotLeg(rr, cd, false, true, -0.4f, -0.6f, 0);
             legs[1] = new RobotLeg(rr, cd, true, true, -0.4f, 0.2f, 0);
             legs[2] = new RobotLeg(rr, cd, false, false, 0.4f, -0.6f, 0);
             legs[3] = new RobotLeg(rr, cd, true, false, 0.4f, 0.2f, 0);
-            
-            eyes[0]=new RobotEye(rr, cd);
-            eyes[1]=new RobotEye(rr, cd);
+
+            eyes[0] = new RobotEye(rr, cd,eyePos(false));
+            eyes[1] = new RobotEye(rr, cd,eyePos(true));
+
+            arms[0] = new RobotArm(rr, cd,new Vector(0.30, 0.8,-0.10),false);
+            arms[1] = new RobotArm(rr, cd,new Vector(-0.30, 0.8, -0.10),true);
         }
 
+        private Vector eyePos(boolean rightEye){
+            if (rightEye) {
+                return pos().add(new Vector(heading.x()*1.1, heading.y()*1.14, 0.6+dGround)).add(rightSide().scale(0.18));
+            }
+            return pos().add(new Vector(heading.x()*1.1, heading.y()*1.14, 0.6+dGround)).add(rightSide().scale(-0.18));
+        }
         /**
          * Draws this robot (as a {@code stickfigure} if specified).
          */
-        public void draw(boolean stickFigure) {
-            float dGround = 1.2f;
+        public void draw(Vector loc, Vector h,boolean stickFigure) {
+            
+            double distance = loc.subtract(pos()).length();
+            posX = (float)loc.x();
+            posY = (float)loc.y();
+            posZ = (float)loc.z();
+            this.heading=h.normalized();
+           
             gl.glPushMatrix();
-            gl.glTranslatef(posX, posY, posZ + dGround);
 
             // set the material properties
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, material.diffuse, 0);
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, material.specular, 0);
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, material.shinyness, 0);
             gl.glColor3f(0.1f, 0.1f, 0.1f);
+            
+            //Left Eye
+            gl.glPushMatrix();
+            eyes[0].Draw(eyePos(false));
+            gl.glPopMatrix();
 
+
+            //Right Eye
+            gl.glPushMatrix();
+            eyes[1].Draw(eyePos(true));
+            gl.glPopMatrix();
+            
+
+            gl.glTranslatef(posX, posY, posZ + dGround);
+            cd.Transform(heading);
+            gl.glRotated(90.0, 1, 0, 0);
+            gl.glRotated(-90.0, 0, 1, 0);
             //Torso
             gl.glPushMatrix();
             gl.glTranslatef(0f, 0f, -0.1f);
@@ -425,57 +512,13 @@ public class RobotRace extends Base {
 
             //Legs
             for (RobotLeg leg : legs) {
-                leg.Draw(dGround);
+                leg.Advance(dGround,distance);
             }
 
             //Arms
-            //Left Arm
-            //Upper Arm
-            gl.glPushMatrix();
-            gl.glTranslatef(0.45f, 1f, -0.15f);
-            gl.glRotatef(-25f, 0f, 0f, 1f);
-            gl.glScalef(0.08f, 0.6f, 0.08f);
-            glut.glutSolidCube(1f);
-            gl.glPopMatrix();
-
-            //Bottom Arm
-            gl.glPushMatrix();
-            gl.glTranslatef(0.58f, 1.35f, -0.15f);
-            gl.glRotatef(90f, 0f, 1f, 0f);
-            gl.glRotatef(-105f, 1f, 0f, 0f);
-            gl.glScalef(0.06f, 0.06f, 0.8f);
-            glut.glutSolidCone(1f, 1f, 10, 10);
-            gl.glPopMatrix();
-
-            //Upper and Bottom Arm joint
-            gl.glPushMatrix();
-            gl.glTranslatef(0.58f, 1.3f, -0.15f);
-            glut.glutSolidSphere(0.10f, 20, 10);
-            gl.glPopMatrix();
-
-            //Left Arm
-            //Upper Arm
-            gl.glPushMatrix();
-            gl.glTranslatef(-0.45f, 1f, -0.15f);
-            gl.glRotatef(25f, 0f, 0f, 1f);
-            gl.glScalef(0.08f, 0.6f, 0.08f);
-            glut.glutSolidCube(1f);
-            gl.glPopMatrix();
-
-            //Bottom Arm
-            gl.glPushMatrix();
-            gl.glTranslatef(-0.58f, 1.35f, -0.15f);
-            gl.glRotatef(90f, 0f, 1f, 0f);
-            gl.glRotatef(-75f, 1f, 0f, 0f);
-            gl.glScalef(0.06f, 0.06f, 0.8f);
-            glut.glutSolidCone(1f, 1f, 10, 10);
-            gl.glPopMatrix();
-
-            //Upper and Bottom Arm joint
-            gl.glPushMatrix();
-            gl.glTranslatef(-0.58f, 1.3f, -0.15f);
-            glut.glutSolidSphere(0.10f, 20, 10);
-            gl.glPopMatrix();
+            for(RobotArm arm:arms){
+                arm.Draw();
+            }
 
             //Head
             gl.glPushMatrix();
@@ -484,33 +527,22 @@ public class RobotRace extends Base {
             glut.glutSolidSphere(1f, 20, 10);
             gl.glPopMatrix();
 
-            //Left Eye
-            //Eye Container
+            //Left Eye Container
             gl.glPushMatrix();
             gl.glTranslatef(0.18f, 1.15f, 0.28f);
             glut.glutSolidCylinder(0.07f, 0.15f, 10, 10);
             gl.glPopMatrix();
-
-            //Eye
-            gl.glPushMatrix();
-            gl.glTranslatef(0.18f, 1.15f, 0.6f);
-            eyes[0].Draw();
-            gl.glPopMatrix();
-
             //Right Eye
             //Eye Container
             gl.glPushMatrix();
             gl.glTranslatef(-0.18f, 1.15f, 0.28f);
             glut.glutSolidCylinder(0.07f, 0.15f, 10, 10);
             gl.glPopMatrix();
-
-            //Eye
-            gl.glPushMatrix();
-            gl.glTranslatef(-0.18f, 1.15f, 0.6f);
-            eyes[1].Draw();
+            
+            
             gl.glPopMatrix();
+            
 
-            gl.glPopMatrix();
 
         }
 
