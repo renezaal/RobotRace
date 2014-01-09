@@ -1,7 +1,7 @@
 
 import com.jogamp.opengl.util.gl2.GLUT;
+import com.jogamp.opengl.util.texture.Texture;
 import java.util.Date;
-import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 import static javax.media.opengl.GL2.*;
 import javax.media.opengl.glu.GLU;
@@ -84,16 +84,9 @@ public class RobotRace extends Base {
         robots = new Robot[4];
 
         // Initialize robot 0
-        robots[0] = new Robot(Material.GOLD,new Vector(0, 0, 0), new Vector(0, 1, 0),this);
-
-//        // Initialize robot 1
-//        robots[1] = new Robot(Material.SILVER, 0, 4, 0, this);
-//
-//        // Initialize robot 2
-//        robots[2] = new Robot(Material.WOOD, 4, 0, 0, this);
-//
-//        // Initialize robot 3
-//        robots[3] = new Robot(Material.ORANGE, 4, 4, 0, this);
+        for (int i = 0; i < 4; i++) {
+            robots[i]= new Robot(Material.GOLD,new Vector(0, i*10, 0), new Vector(0, 1, 0),this);
+        }
 
         // Initialize the camera
         camera = new Camera();
@@ -167,7 +160,7 @@ public class RobotRace extends Base {
         // we need to take half the height first, then later on multiply by two
         // essentially we create a triangle with a 90 degree angle with the vDist 
         // and the upper half of the height
-        float fovY = (float) Math.atan((0.5f * vHeight) / gs.vDist) * 2f;
+        float fovY = (float) Math.atan2((0.5f * vHeight) , gs.vDist) * 2f;
         fovY = (float) Math.toDegrees(fovY);
 
         // now simply add our calculated values to the method call
@@ -249,11 +242,10 @@ public double timePassed(){
         Vector roboLoc= new Vector(x, y, 0);
         Vector heading=roboLoc.cross(Vector.Z);
         
-        robots[0].draw(Vector.O,heading,false);
-//        // Draw all four robots
-//        for (int i = 0; i < robots.length; i++) {
-//            robots[i].draw(false);
-//        }
+        // Draw all four robots
+        for (int i = 0; i < robots.length; i++) {
+            robots[i].draw(robots[i].getLocation(),heading,false);
+        }
 
         // Draw race track
         raceTrack.draw(gs.trackNr);
@@ -452,6 +444,9 @@ public double timePassed(){
         (float)alpha};
     }
 
+    public Texture getBrick(){
+        return brick;
+    }
     /**
      * Represents a Robot, to be implemented according to the Assignments.
      */
@@ -513,6 +508,11 @@ private float dGround = 1.2f;
         public Material getMaterial(){
             return this.material;
         }
+        
+        // returns the current location of the robot
+        public Vector getLocation(){
+            return pos();
+        }
 
         // calculates the absolute position of an eye
         private Vector eyePos(boolean rightEye){
@@ -562,7 +562,7 @@ private float dGround = 1.2f;
 
             //Legs
             for (RobotLeg leg : legs) {
-                leg.Advance(dGround,distance);
+               // leg.Advance(dGround,0.1);
             }
 
             //Arms

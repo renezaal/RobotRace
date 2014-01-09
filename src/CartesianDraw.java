@@ -1,10 +1,9 @@
 
 import com.jogamp.opengl.util.gl2.GLUT;
-import javax.media.opengl.GL;
+import com.jogamp.opengl.util.texture.Texture;
 import javax.media.opengl.GL2;
 import static javax.media.opengl.GL2.*;
 import javax.media.opengl.glu.GLU;
-import robotrace.Base;
 import robotrace.Vector;
 
 /**

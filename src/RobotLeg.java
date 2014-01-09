@@ -39,6 +39,10 @@ public class RobotLeg {
     private float stepEnd = 0.3f;
     private boolean onTheGround = Math.random() < 0.5;
     private Date time = new Date();
+    // the neutral point is some sort of ideal point for the foot to stan in
+    private Vector neutral;
+    private int relaxTimer=0;
+    private double maxDistance=0.3;
 
     private float stepLength() {
         return stepEnd - stepStart;
@@ -50,18 +54,17 @@ public class RobotLeg {
         glut = rr.getGLUT();
     }
 
-    public void Advance(float dGround, double amount) {
+    public void Advance(float dGround, Vector newNeutral) {
         Vector foot;
         Date newTime = new Date();
         double timeLapsed = ((double) (newTime.getTime() - time.getTime())) * 0.01;
         time = newTime;
+        
         // regulate the loop
         if (onTheGround) {
-            stepPos -= amount;
-            if (stepPos < stepStart) {
-                stepEnd = (float) ((Math.random() * 1d) + 0.3);
+            double distance = neutral.subtract(newNeutral).length();
+            if (distance>maxDistance) {
                 onTheGround = false;
-                stepPos = stepStart;
             }
         } else {
             stepPos += timeLapsed;
@@ -122,6 +125,6 @@ public class RobotLeg {
     }
 
     public void Draw(float dGround) {
-        Advance(dGround, 0.1);
+       // Advance(dGround, 0.1);
     }
 }
