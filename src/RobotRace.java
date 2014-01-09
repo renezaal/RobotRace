@@ -84,7 +84,7 @@ public class RobotRace extends Base {
         robots = new Robot[4];
 
         // Initialize robot 0
-        robots[0] = new Robot(Material.GOLD, 0, 0, 0, new Vector(0, 1, 0),this);
+        robots[0] = new Robot(Material.GOLD,new Vector(0, 0, 0), new Vector(0, 1, 0),this);
 
 //        // Initialize robot 1
 //        robots[1] = new Robot(Material.SILVER, 0, 4, 0, this);
@@ -232,6 +232,10 @@ public double timePassed(){
         gl.glColor3f(0f, 0f, 0f);
 
         gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        
+        // enable transparency
+    gl.glEnable (GL_BLEND); 
+    gl.glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
 
         // Draw the axis frame
         if (gs.showAxes) {
@@ -331,32 +335,35 @@ public double timePassed(){
     public enum Material {
 
         /**
-         * Gold material properties. Modify the default values to make it look
-         * like gold.
+         * Gold material properties. 
          */
         GOLD(
                 new float[]{0.75164f, 0.60648f, 0.22648f, 1f},
                 new float[]{0.628281f, 0.555802f, 0.366065f, 1f},
                 new float[]{51.2f}),
         /**
-         * Silver material properties. Modify the default values to make it look
-         * like silver.
+         * Silver material properties. 
          */
         SILVER(
                 new float[]{0.50754f, 0.50754f, 0.50754f, 1f},
                 new float[]{0.508273f, 0.508273f, 0.508273f, 1f},
                 new float[]{51.2f}),
         /**
-         * Wood material properties. Modify the default values to make it look
-         * like wood.
+         * Wood material properties. 
          */
         WOOD(
                 new float[]{0.227f, 0.13f, 0.065f, 1.0f},
                 new float[]{0.3f, 0.14f, 0.071f, 1.0f},
                 new float[]{2f}),
+        
+        FORCEFIELD(
+                forceFieldColor(),
+                forceFieldColor(),
+                new float[]{0f}
+    ),
+        
         /**
-         * Orange material properties. Modify the default values to make it look
-         * like orange.
+         * Orange material properties.
          */
         ORANGE(
                 new float[]{1f, 0.5f, 0f, 1.0f},
@@ -390,6 +397,8 @@ public double timePassed(){
                 new float[]{1f, 0f, 0f, 1.0f},
                 new float[]{1f, 0f, 0f, 1.0f},
                 new float[]{20f});
+        
+        
         /**
          * The diffuse RGBA reflectance of the material.
          */
@@ -403,6 +412,22 @@ public double timePassed(){
         // The shininess of the material in RGBA
         float[] shinyness;
 
+        public void use(GL2 gl){
+            
+            // set the material properties
+            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse, 0);
+            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular, 0);
+            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shinyness, 0);
+            gl.glColor3f(0.1f, 0.1f, 0.1f);
+        }
+        
+        public void update(){
+            if (this==FORCEFIELD) {
+                diffuse=forceFieldColor();
+                specular=forceFieldColor();
+            }
+        }
+        
         /**
          * Constructs a new material with diffuse and specular properties.
          */
@@ -412,11 +437,25 @@ public double timePassed(){
             this.shinyness = shinyness;
         }
     }
+    
+    static private float[] forceFieldColor(){
+
+        double base = Math.random();
+        double red = base*0.2;
+        double green = base*0.2;
+        double blue = base;
+        double alpha = (Math.random()+1)*0.2;
+        return new float[] {
+        (float)red,
+        (float)green,
+        (float)blue,
+        (float)alpha};
+    }
 
     /**
      * Represents a Robot, to be implemented according to the Assignments.
      */
-    private class Robot {
+    public class Robot {
 
         /**
          * The material from which this robot is built.
@@ -442,12 +481,20 @@ private Vector heading;
 private float dGround = 1.2f;
         /**
          * Constructs the robot with initial parameters.
+         * @param material
+         * The main material the robot is made of
+         * @param pos
+         * Position of the robot
+         * @param heading
+         * The heading of the robot
+         * @param rr
+         * The robotrace instance containing this robot
          */
-        public Robot(Material material, float posX, float posY, float posZ, Vector heading, RobotRace rr) {
+        public Robot(Material material, Vector pos, Vector heading, RobotRace rr) {
             this.material = material;
-            this.posX = posX;
-            this.posY = posY;
-            this.posZ = posZ;
+            this.posX = (float)pos.x();
+            this.posY = (float)pos.y();
+            this.posZ = (float)pos.z();
             this.heading=heading.normalized();
 
             legs[0] = new RobotLeg(rr, cd, false, true, -0.4f, -0.6f, 0);
@@ -455,13 +502,19 @@ private float dGround = 1.2f;
             legs[2] = new RobotLeg(rr, cd, false, false, 0.4f, -0.6f, 0);
             legs[3] = new RobotLeg(rr, cd, true, false, 0.4f, 0.2f, 0);
 
-            eyes[0] = new RobotEye(rr, cd,eyePos(false));
-            eyes[1] = new RobotEye(rr, cd,eyePos(true));
+            eyes[0] = new RobotEye(rr,this, cd,eyePos(false));
+            eyes[1] = new RobotEye(rr,this, cd,eyePos(true));
 
             arms[0] = new RobotArm(rr, cd,new Vector(0.30, 0.8,-0.10),false);
             arms[1] = new RobotArm(rr, cd,new Vector(-0.30, 0.8, -0.10),true);
         }
+        
+        // returns the material of the robot
+        public Material getMaterial(){
+            return this.material;
+        }
 
+        // calculates the absolute position of an eye
         private Vector eyePos(boolean rightEye){
             if (rightEye) {
                 return pos().add(new Vector(heading.x()*1.1, heading.y()*1.14, 0.6+dGround)).add(rightSide().scale(0.18));
@@ -482,10 +535,7 @@ private float dGround = 1.2f;
             gl.glPushMatrix();
 
             // set the material properties
-            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, material.diffuse, 0);
-            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, material.specular, 0);
-            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, material.shinyness, 0);
-            gl.glColor3f(0.1f, 0.1f, 0.1f);
+            material.use(gl);
             
             //Left Eye
             gl.glPushMatrix();
@@ -543,6 +593,16 @@ private float dGround = 1.2f;
             gl.glPopMatrix();
             
 
+            //Left Eye
+            gl.glPushMatrix();
+            eyes[0].drawForceField(eyePos(false));
+            gl.glPopMatrix();
+
+
+            //Right Eye
+            gl.glPushMatrix();
+            eyes[1].drawForceField(eyePos(true));
+            gl.glPopMatrix();
 
         }
 

@@ -6,11 +6,8 @@
 
 import com.jogamp.opengl.util.gl2.GLUT;
 import java.util.Date;
-import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
-import static javax.media.opengl.GL2.*;
 import javax.media.opengl.glu.GLU;
-import robotrace.Base;
 import robotrace.Vector;
 
 /**
@@ -19,13 +16,16 @@ import robotrace.Vector;
  */
 public class RobotEye {
 
-    public RobotEye(RobotRace rr, CartesianDraw cd,Vector pos) {
+    public RobotEye(RobotRace rr,RobotRace.Robot r, CartesianDraw cd,Vector pos) {
         this.rr = rr;
         this.cd = cd;
         time = new Date();
         this.pos=pos;
+        this.lastIdealPos=pos;
+        this.r=r;
     }
 
+    private RobotRace.Robot r;
     private RobotRace rr;
     private CartesianDraw cd;
     private GL2 gl;
@@ -40,13 +40,19 @@ public class RobotEye {
 
     private double timeElapsedMax2 = 0;
     private Date time;
+    // the position of the eye
     private Vector pos;
+    // is the vector of speed in units per second
     private Vector movement= new Vector(0, 0, 0);
+    private Vector lastIdealPos;
 
     public void Draw(Vector idealPos) {
         pre();
         double drag = 0.01;
         double accelerationMultiplier=1.0;
+        // the max distance is when the eye touches the forcefield
+        // so the radius of the forcefield minus the radius of the eye and minus a small value to avoid clipping
+        double maxDistance = (0.2-(0.07))-0.01;
         Date newTime = new Date();
         int timeE = (int) (newTime.getTime() - time.getTime());
         time=newTime;
@@ -55,29 +61,53 @@ public class RobotEye {
         timeElapsedMax2=timeElapsedMax2%2;
         
         // redefine the ideal position with a new Z for the bobbing effect
-        idealPos= new Vector(idealPos.x(), idealPos.y(), idealPos.z()+(Math.sin(timeElapsedMax2*2*Math.PI)*0.2));
+        idealPos= new Vector(idealPos.x(), idealPos.y(), idealPos.z()+(Math.sin(timeElapsedMax2*2*Math.PI)*0.02));
         // calculate the direction of the acceleration, this is essentially the vector from the current position to the ideal one
         Vector accelerationDir=idealPos.subtract(pos);
         // calculate the distance between the current position and the ideal one
-        double seperation = accelerationDir.length();
+        double separation = accelerationDir.length();
         // normalize the acceleration Vector used to track the direction of acceleration
         accelerationDir=accelerationDir.normalized();
         // scale the acceleration vector to match the realistic magnitude
-        Vector acceleration = accelerationDir.scale(Math.pow(seperation, 4)*timeElapsed*timeElapsed*accelerationMultiplier);
+        Vector acceleration = accelerationDir.scale(Math.pow(separation*10.0, 2)*timeElapsed*timeElapsed*accelerationMultiplier);
         
         // calculate the new speed vector
         movement=movement.add(acceleration);
         
         // incorporate drag
-        movement=movement.add(movement.scale(-drag*timeElapsed));
+        movement=movement.subtract(movement.scale(drag*timeElapsed));
         
         // calculate the new position using the movement vector
         pos=pos.add(movement.scale(timeElapsed));
         
+        // calculate the new separation
+        separation=pos.subtract(idealPos).length();
         
+        // if the orb is outside the forcefield
+        if (separation>maxDistance) {
+            // put it back inside
+            pos=idealPos.add(accelerationDir.scale(-maxDistance));
+            // and reset the speed to stimulate bouncing against the forcefield with loss of all own kinetic energy
+            movement=accelerationDir.scale(idealPos.subtract(lastIdealPos).length()/timeElapsed);
+        }
+        
+        // draw the eye
         gl.glPushMatrix();
         gl.glTranslated(pos.x(), pos.y(), pos.z());
         glut.glutSolidSphere(0.07f, 10, 10);
+        gl.glPopMatrix();
+        lastIdealPos=idealPos;
+    }
+    
+    public void drawForceField(Vector idealPos){
+        pre();
+                
+        // draw the forcefield
+        gl.glPushMatrix();
+        RobotRace.Material.FORCEFIELD.update();
+        RobotRace.Material.FORCEFIELD.use(gl);
+        cd.Orb(idealPos, 0.2f, 10);
+        r.getMaterial().use(gl);
         gl.glPopMatrix();
     }
 }

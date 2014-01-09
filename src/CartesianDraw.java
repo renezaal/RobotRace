@@ -28,10 +28,14 @@ public class CartesianDraw {
         glu = rr.getGLU();
         glut = rr.getGLUT();
     }
+    
+    // alternate parameterization of the Orb method
+    public void Orb(Vector v, float radius, int detail) {
+        Orb((float)v.x(), (float)v.y(), (float)v.z(), radius, detail);
+    }
 
     // alternate parameterization of the Orb method
     public void Orb(float x1, float y1, float z1, float radius, int detail) {
-        pre();
         Orb(x1, y1, z1, radius, radius, radius, detail);
     }
 
