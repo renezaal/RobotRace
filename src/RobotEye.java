@@ -61,7 +61,7 @@ public class RobotEye {
         timeElapsedMax2=timeElapsedMax2%2;
         
         // redefine the ideal position with a new Z for the bobbing effect
-        idealPos= new Vector(idealPos.x(), idealPos.y(), idealPos.z()+(Math.sin(timeElapsedMax2*2*Math.PI)*0.5));
+        idealPos= new Vector(idealPos.x(), idealPos.y(), idealPos.z()+(Math.sin(timeElapsedMax2*2*Math.PI)*0.02));
         // calculate the direction of the acceleration, this is essentially the vector from the current position to the ideal one
         Vector accelerationDir=idealPos.subtract(pos);
         // calculate the distance between the current position and the ideal one
@@ -69,7 +69,7 @@ public class RobotEye {
         // normalize the acceleration Vector used to track the direction of acceleration
         accelerationDir=accelerationDir.normalized();
         // scale the acceleration vector to match the realistic magnitude
-        Vector acceleration = accelerationDir.scale(Math.pow(separation, 4)*timeElapsed*timeElapsed*accelerationMultiplier);
+        Vector acceleration = accelerationDir.scale(separation*timeElapsed*timeElapsed*accelerationMultiplier);
         
         // calculate the new speed vector
         movement=movement.add(acceleration);
@@ -80,16 +80,16 @@ public class RobotEye {
         // calculate the new position using the movement vector
         pos=pos.add(movement.scale(timeElapsed));
         
-//        // calculate the new separation
-//        separation=pos.subtract(idealPos).length();
-//        
-//        // if the orb is outside the forcefield
-//        if (separation>maxDistance) {
-//            // put it back inside
-//            pos=idealPos.add(accelerationDir.scale(-maxDistance));
-//            // and reset the speed to stimulate getting pushed by the forcefield with loss of all own kinetic energy
-//            movement=accelerationDir.scale(idealPos.subtract(lastIdealPos).length()/timeElapsed);
-//        }
+        // calculate the new separation
+        separation=pos.subtract(idealPos).length();
+        
+        // if the orb is outside the forcefield
+        if (separation>maxDistance) {
+            // put it back inside
+            pos=idealPos.add(accelerationDir.scale(-maxDistance));
+            // and reset the speed to stimulate getting pushed by the forcefield with loss of all own kinetic energy
+            movement=accelerationDir.scale(idealPos.subtract(lastIdealPos).length()/timeElapsed);
+        }
         
         // draw the eye
         gl.glPushMatrix();

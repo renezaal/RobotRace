@@ -85,7 +85,7 @@ public class RobotRace extends Base {
 
         // Initialize robot 0
         for (int i = 0; i < 4; i++) {
-            robots[i]= new Robot(Material.GOLD,new Vector(0, i*10, 0), new Vector(0, 1, 0),this);
+            robots[i] = new Robot(Material.GOLD, new Vector(0, i * 10, 0), new Vector(0, 1, 0), this);
         }
 
         // Initialize the camera
@@ -160,7 +160,7 @@ public class RobotRace extends Base {
         // we need to take half the height first, then later on multiply by two
         // essentially we create a triangle with a 90 degree angle with the vDist 
         // and the upper half of the height
-        float fovY = (float) Math.atan2((0.5f * vHeight) , gs.vDist) * 2f;
+        float fovY = (float) Math.atan2((0.5f * vHeight), gs.vDist) * 2f;
         fovY = (float) Math.toDegrees(fovY);
 
         // now simply add our calculated values to the method call
@@ -173,37 +173,39 @@ public class RobotRace extends Base {
         // Update the view according to the camera mode
         camera.update(gs.camMode);
     }
-    
+
     // variable for storing the last time a draw was called
     private Date time = new Date();
-    
+
     // variable for storing the time between draws
-private double timePassed=1;
+    private double timePassed = 1;
 
 // variable for keeping track of loops, is reset at 600 seconds/10 minutes
-private double loop=0;
+    private double loop = 0;
 
 // gets the time between this draw and the previous one
-public double timePassed(){
-    return timePassed;
-}
+    public double getTime() {
+        return timePassed;
+    }
 // calculates the time that passed since the last time this method was called
-    private void newTime(){
+
+    private void newTime() {
         // new time that is current
         Date newTime = new Date();
-        
+
         // difference between the already existing time and the new one
-        long difference = newTime.getTime()-time.getTime();
-        
+        long difference = newTime.getTime() - time.getTime();
+
         // difference expressed as fractional seconds
-        timePassed=((double)difference)/1000.0;
-        
+        timePassed = ((double) difference) / 1000.0;
+
         // updates the loop
-        loop=(loop+timePassed)%600;
-        
+        loop = (loop + timePassed) % 600;
+
         // set the time to the current one
-        time=newTime;
+        time = newTime;
     }
+
     /**
      * Draws the entire scene.
      */
@@ -211,7 +213,7 @@ public double timePassed(){
     public void drawScene() {
         // update the measured time between draws
         newTime();
-        
+
         // Background color.
         gl.glClearColor(1f, 1f, 1f, 0f);
 
@@ -225,26 +227,25 @@ public double timePassed(){
         gl.glColor3f(0f, 0f, 0f);
 
         gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        
+
         // enable transparency
-    gl.glEnable (GL_BLEND); 
-    gl.glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+        gl.glEnable(GL_BLEND);
+        gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         // Draw the axis frame
         if (gs.showAxes) {
             drawAxisFrame();
         }
-        
-       double x= Math.sin(loop%(2.0*Math.PI))*10;
-      double y=  Math.cos(loop%(2.0*Math.PI))*5;
-        
-      
-        Vector roboLoc= new Vector(x, y, 0);
-        Vector heading=roboLoc.cross(Vector.Z);
-        
+
+        double x = Math.sin((loop/1.0) % (2.0 * Math.PI)) * 10;
+        double y = Math.cos((loop/1.0) % (2.0 * Math.PI)) * 5;
+
+        Vector roboLoc = new Vector(x, y, 0);
+        Vector heading = roboLoc.cross(Vector.Z);
+//Vector roboPos = (new Vector(x,y,0)).scale(3.0);
         // Draw all four robots
         for (int i = 0; i < robots.length; i++) {
-            robots[i].draw(robots[i].getLocation(),heading,false);
+            robots[i].draw(robots[i].getLocation(), heading, false);
         }
 
         // Draw race track
@@ -327,33 +328,31 @@ public double timePassed(){
     public enum Material {
 
         /**
-         * Gold material properties. 
+         * Gold material properties.
          */
         GOLD(
                 new float[]{0.75164f, 0.60648f, 0.22648f, 1f},
                 new float[]{0.628281f, 0.555802f, 0.366065f, 1f},
                 new float[]{51.2f}),
         /**
-         * Silver material properties. 
+         * Silver material properties.
          */
         SILVER(
                 new float[]{0.50754f, 0.50754f, 0.50754f, 1f},
                 new float[]{0.508273f, 0.508273f, 0.508273f, 1f},
                 new float[]{51.2f}),
         /**
-         * Wood material properties. 
+         * Wood material properties.
          */
         WOOD(
                 new float[]{0.227f, 0.13f, 0.065f, 1.0f},
                 new float[]{0.3f, 0.14f, 0.071f, 1.0f},
                 new float[]{2f}),
-        
         FORCEFIELD(
                 forceFieldColor(),
                 forceFieldColor(),
                 new float[]{0f}
-    ),
-        
+        ),
         /**
          * Orange material properties.
          */
@@ -389,8 +388,7 @@ public double timePassed(){
                 new float[]{1f, 0f, 0f, 1.0f},
                 new float[]{1f, 0f, 0f, 1.0f},
                 new float[]{20f});
-        
-        
+
         /**
          * The diffuse RGBA reflectance of the material.
          */
@@ -404,22 +402,22 @@ public double timePassed(){
         // The shininess of the material in RGBA
         float[] shinyness;
 
-        public void use(GL2 gl){
-            
+        public void use(GL2 gl) {
+
             // set the material properties
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, diffuse, 0);
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, specular, 0);
             gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, shinyness, 0);
             gl.glColor3f(0.1f, 0.1f, 0.1f);
         }
-        
-        public void update(){
-            if (this==FORCEFIELD) {
-                diffuse=forceFieldColor();
-                specular=forceFieldColor();
+
+        public void update() {
+            if (this == FORCEFIELD) {
+                diffuse = forceFieldColor();
+                specular = forceFieldColor();
             }
         }
-        
+
         /**
          * Constructs a new material with diffuse and specular properties.
          */
@@ -429,24 +427,25 @@ public double timePassed(){
             this.shinyness = shinyness;
         }
     }
-    
-    static private float[] forceFieldColor(){
+
+    static private float[] forceFieldColor() {
 
         double base = Math.random();
-        double red = base*0.2;
-        double green = base*0.2;
+        double red = base * 0.2;
+        double green = base * 0.2;
         double blue = base;
-        double alpha = (Math.random()+1)*0.2;
-        return new float[] {
-        (float)red,
-        (float)green,
-        (float)blue,
-        (float)alpha};
+        double alpha = (Math.random() + 1) * 0.2;
+        return new float[]{
+            (float) red,
+            (float) green,
+            (float) blue,
+            (float) alpha};
     }
 
-    public Texture getBrick(){
+    public Texture getBrick() {
         return brick;
     }
+
     /**
      * Represents a Robot, to be implemented according to the Assignments.
      */
@@ -456,98 +455,109 @@ public double timePassed(){
          * The material from which this robot is built.
          */
         private final Material material;
-        private Vector pos(){
+
+        private Vector pos() {
             return new Vector(posX, posY, posZ);
         }
-        private Vector heading(){
+
+        private Vector heading() {
             return heading.normalized();
         }
-        private Vector rightSide(){
+
+        private Vector rightSide() {
             return Vector.Z.cross(heading).normalized();
         }
-        private Vector normal(){
+
+        private Vector normal() {
             return heading.cross(rightSide());
         }
         private float posX, posY, posZ;
         private RobotLeg[] legs = new RobotLeg[4];
         private RobotEye[] eyes = new RobotEye[2];
         private RobotArm[] arms = new RobotArm[2];
-private Vector heading;
-private float dGround = 1.2f;
+        private Vector heading;
+        private float dGround = 1.2f;
+
         /**
          * Constructs the robot with initial parameters.
-         * @param material
-         * The main material the robot is made of
-         * @param pos
-         * Position of the robot
-         * @param heading
-         * The heading of the robot
-         * @param rr
-         * The robotrace instance containing this robot
+         *
+         * @param material The main material the robot is made of
+         * @param pos Position of the robot
+         * @param heading The heading of the robot
+         * @param rr The robotrace instance containing this robot
          */
         public Robot(Material material, Vector pos, Vector heading, RobotRace rr) {
             this.material = material;
-            this.posX = (float)pos.x();
-            this.posY = (float)pos.y();
-            this.posZ = (float)pos.z();
-            this.heading=heading.normalized();
+            this.posX = (float) pos.x();
+            this.posY = (float) pos.y();
+            this.posZ = (float) pos.z();
+            this.heading = heading.normalized();
 
-            legs[0] = new RobotLeg(rr, cd, false, true, -0.4f, -0.6f, 0);
-            legs[1] = new RobotLeg(rr, cd, true, true, -0.4f, 0.2f, 0);
-            legs[2] = new RobotLeg(rr, cd, false, false, 0.4f, -0.6f, 0);
-            legs[3] = new RobotLeg(rr, cd, true, false, 0.4f, 0.2f, 0);
+            legs[0] = new RobotLeg(rr, cd, footPos(false, true),false, true);
+            legs[1] = new RobotLeg(rr, cd, footPos(true, true),true, true);
+            legs[2] = new RobotLeg(rr, cd, footPos(false, false),false, false);
+            legs[3] = new RobotLeg(rr, cd, footPos(true, false),true, false);
 
-            eyes[0] = new RobotEye(rr,this, cd,eyePos(false));
-            eyes[1] = new RobotEye(rr,this, cd,eyePos(true));
+            eyes[0] = new RobotEye(rr, this, cd, eyePos(false));
+            eyes[1] = new RobotEye(rr, this, cd, eyePos(true));
 
-            arms[0] = new RobotArm(rr, cd,new Vector(0.30, 0.8,-0.10),false);
-            arms[1] = new RobotArm(rr, cd,new Vector(-0.30, 0.8, -0.10),true);
+            arms[0] = new RobotArm(rr, cd, new Vector(0.30, 0.8, -0.10), false);
+            arms[1] = new RobotArm(rr, cd, new Vector(-0.30, 0.8, -0.10), true);
         }
-        
+
         // returns the material of the robot
-        public Material getMaterial(){
+        public Material getMaterial() {
             return this.material;
         }
-        
+
         // returns the current location of the robot
-        public Vector getLocation(){
+        public Vector getLocation() {
             return pos();
         }
 
         // calculates the absolute position of an eye
-        private Vector eyePos(boolean rightEye){
-            if (rightEye) {
-                return pos().add(new Vector(heading.x()*1.1, heading.y()*1.14, 0.6+dGround)).add(rightSide().scale(0.18));
-            }
-            return pos().add(new Vector(heading.x()*1.1, heading.y()*1.14, 0.6+dGround)).add(rightSide().scale(-0.18));
+        private Vector eyePos(boolean rightEye) {
+            double relX = rightEye ? 0.18 : -0.18;
+            double relY = 1.14;
+            double relZ = 0.6 ;
+            return absolutePosition(relX, relY, relZ);
         }
+
+        // returns an absolute position based on a relative position
+        private Vector absolutePosition(double x, double y, double z) {
+            return pos().add(new Vector(heading.x() * y, heading.y() * y, z+ dGround)).add(rightSide().scale(x));
+        }
+
+        private Vector legPos(boolean rightLeg, boolean front) {
+            double relX = rightLeg ? 0.35 : -0.35;
+            double relY = front ? 0.2 : -0.6;
+            double relZ = 0;
+            return absolutePosition(relX, relY, relZ);
+        }
+
+        private Vector footPos(boolean rightFoot, boolean front) {
+            double relX = rightFoot ? 1.8 : -1.8;
+            double relY = front ? 0.4 : -0.7;
+            double relZ = -dGround;
+            return absolutePosition(relX, relY, relZ);
+        }
+
         /**
          * Draws this robot (as a {@code stickfigure} if specified).
          */
-        public void draw(Vector loc, Vector h,boolean stickFigure) {
-            
+        public void draw(Vector loc, Vector h, boolean stickFigure) {
+
             double distance = loc.subtract(pos()).length();
-            posX = (float)loc.x();
-            posY = (float)loc.y();
-            posZ = (float)loc.z();
-            this.heading=h.normalized();
-           
+            posX = (float) loc.x();
+            posY = (float) loc.y();
+            posZ = (float) loc.z();
+            this.heading = h.normalized();
+
             gl.glPushMatrix();
 
             // set the material properties
             material.use(gl);
-            
-            //Left Eye
-            gl.glPushMatrix();
-            eyes[0].Draw(eyePos(false));
-            gl.glPopMatrix();
 
-
-            //Right Eye
-            gl.glPushMatrix();
-            eyes[1].Draw(eyePos(true));
-            gl.glPopMatrix();
-            
 
             gl.glTranslatef(posX, posY, posZ + dGround);
             cd.Transform(heading);
@@ -560,13 +570,9 @@ private float dGround = 1.2f;
             glut.glutSolidSphere(1f, 20, 10);
             gl.glPopMatrix();
 
-            //Legs
-            for (RobotLeg leg : legs) {
-               // leg.Advance(dGround,0.1);
-            }
 
             //Arms
-            for(RobotArm arm:arms){
+            for (RobotArm arm : arms) {
                 arm.Draw();
             }
 
@@ -588,22 +594,36 @@ private float dGround = 1.2f;
             gl.glTranslatef(-0.18f, 1.15f, 0.28f);
             glut.glutSolidCylinder(0.07f, 0.15f, 10, 10);
             gl.glPopMatrix();
+
+            gl.glPopMatrix();
+
+            //Legs
+            for (RobotLeg leg : legs) {
+                 leg.Advance(footPos(leg.isRight(), leg.isFront()),legPos(leg.isRight(), leg.isFront()));
+            }
             
             
+            //Left Eye
+            gl.glPushMatrix();
+            eyes[0].Draw(eyePos(false));
+            gl.glPopMatrix();
+
+            //Right Eye
+            gl.glPushMatrix();
+            eyes[1].Draw(eyePos(true));
             gl.glPopMatrix();
             
-
             //Left Eye
             gl.glPushMatrix();
             eyes[0].drawForceField(eyePos(false));
             gl.glPopMatrix();
-
 
             //Right Eye
             gl.glPushMatrix();
             eyes[1].drawForceField(eyePos(true));
             gl.glPopMatrix();
 
+            
         }
 
     }
