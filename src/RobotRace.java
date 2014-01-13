@@ -745,8 +745,13 @@ public class RobotRace extends Base {
     /**
      * Implementation of a race track that is made from Bezier segments.
      */
-    private class RaceTrack {
-
+        private class RaceTrack {
+        int testTrack = -1;
+        int oTrack = -1;
+        int lTrack = -1;
+        int cTrack = -1;
+        int customTrack = -1;
+        
         /**
          * Array with control points for the O-track.
          */
@@ -771,19 +776,71 @@ public class RobotRace extends Base {
          * Constructs the race track, sets up display lists.
          */
         public RaceTrack() {
-            // code goes here ...
-        }
 
+        }
+        
+        
         /**
          * Draws this track, based on the selected track number.
          */
         public void draw(int trackNr) {
-
+            
+            double numberOfSteps = 200;
+            double step = 1 / numberOfSteps;
+            
             // The test track is selected
             if (0 == trackNr) {
-                // code goes here ...
-
-                // The O-track is selected
+                if (testTrack == -1) {
+                   testTrack = gl.glGenLists(1);
+                   gl.glNewList(testTrack, GL_COMPILE);
+                   
+                   gl.glBegin(GL_TRIANGLES);
+                        for (double t = 0; t < 1; t += step) {
+                            Vector current = getPoint(t);
+                            Vector next = getPoint(t + step);
+                            Vector currentPerpendicular = getTangent(t).cross(Vector.Z).normalized();
+                            Vector nextPerpendicular = getTangent(t + step).cross(Vector.Z).normalized();
+                            Vector currentTrackOuter = current.add(currentPerpendicular.scale(2)).add(Vector.Z);
+                            Vector currentTrackInner = current.add(currentPerpendicular.scale(-2)).add(Vector.Z);
+                            Vector nextTrackOuter = next.add(nextPerpendicular.scale(2)).add(Vector.Z);
+                            Vector nextTrackInner = next.add(nextPerpendicular.scale(-2)).add(Vector.Z);
+                            
+                            Vector currentBaseOuter = current.add(currentPerpendicular.scale(2));
+                            Vector currentBaseInner = current.add(currentPerpendicular.scale(-2));
+                            Vector nextBaseOuter = next.add(nextPerpendicular.scale(2));
+                            Vector nextBaseInner = next.add(nextPerpendicular.scale(-2));
+                            
+                            gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
+                            gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
+                            gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
+                            
+                            gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
+                            gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
+                            gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
+                                                        
+                            gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
+                            gl.glVertex3d(currentBaseOuter.x(), currentBaseOuter.y(), currentBaseOuter.z());
+                            gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
+                                    
+                            gl.glVertex3d(currentBaseOuter.x(), currentBaseOuter.y(), currentBaseOuter.z());
+                            gl.glVertex3d(nextBaseOuter.x(), nextBaseOuter.y(), nextBaseOuter.z());
+                            gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
+                            
+                            gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
+                            gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
+                            gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
+                            
+                            gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
+                            gl.glVertex3d(currentBaseInner.x(), currentBaseInner.y(), currentBaseInner.z());
+                            gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
+                            
+                            
+                        }
+                        gl.glEnd();
+                        gl.glEndList();
+                } else {
+                        gl.glCallList(testTrack);
+                }         
             } else if (1 == trackNr) {
                 // code goes here ...
 
@@ -806,19 +863,22 @@ public class RobotRace extends Base {
          * Returns the position of the curve at 0 <= {@code t} <= 1.
          */
         public Vector getPoint(double t) {
-            return Vector.O; // <- code goes here
+            return new Vector(  10*Math.cos(2*Math.PI*t),
+                                14*Math.sin(2*Math.PI*t),
+                                1);
         }
 
         /**
          * Returns the tangent of the curve at 0 <= {@code t} <= 1.
          */
         public Vector getTangent(double t) {
-            return Vector.O; // <- code goes here
+            return new Vector(  20*Math.PI*-Math.sin(2*Math.PI*t), 
+                                28*Math.PI*Math.cos(2*Math.PI*t), 
+                                1);
         }
 
     }
-
-    /**
+     /**
      * Implementation of the terrain.
      */
     private class Terrain {
