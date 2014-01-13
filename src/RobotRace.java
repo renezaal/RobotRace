@@ -2,6 +2,7 @@
 import com.jogamp.opengl.util.gl2.GLUT;
 import com.jogamp.opengl.util.texture.Texture;
 import java.util.Date;
+import static javax.media.opengl.GL.GL_TRIANGLES;
 import javax.media.opengl.GL2;
 import static javax.media.opengl.GL2.*;
 import javax.media.opengl.glu.GLU;
@@ -755,17 +756,29 @@ public class RobotRace extends Base {
         /**
          * Array with control points for the O-track.
          */
-        private Vector[] controlPointsOTrack;
-
+        private Vector[] controlPointsOTrack = {                                
+                                new Vector(0, -20, 0),   new Vector(30, -20, 0),    new Vector(30, 20, 0),  new Vector(0, 20, 0),
+                                new Vector(0, -20, 0),   new Vector(-30, -20, 0),   new Vector(-30, 20, 0), new Vector(0, 20, 0)
+                                };
         /**
          * Array with control points for the L-track.
          */
-        private Vector[] controlPointsLTrack;
+        private Vector[] controlPointsLTrack = {                                
+                                new Vector(-20, 40, 0),   new Vector(-20, -20, 0),  new Vector(-20, -20, 0),  new Vector(20, -20, 0),
+                                new Vector(0, 40, 0),     new Vector(0, 0, 0),      new Vector(0, 0, 0),      new Vector(20, 0, 0),
+                                new Vector(20, 0, 0),     new Vector(30, 0, 0),      new Vector(30, -20, 0),      new Vector(20, -20, 0),
+                                new Vector(-20, 40, 0),     new Vector(-20, 50, 0),      new Vector(0, 50, 0),      new Vector(0, 40, 0),
+                                };
 
         /**
          * Array with control points for the C-track.
          */
-        private Vector[] controlPointsCTrack;
+        private Vector[] controlPointsCTrack  = {                                
+                                new Vector(10, 10, 0),   new Vector(0, 10, 0),  new Vector(0, -10, 0),  new Vector(10, -10, 0),
+                                new Vector(10, -10, 0),     new Vector(20, -10, 0),      new Vector(20, -30, 0),      new Vector(10, -30, 0),
+                                new Vector(10, -30, 0),     new Vector(-30, -30, 0),      new Vector(-30, 30, 0),      new Vector(10, 30, 0),
+                                new Vector(10, 10, 0),     new Vector(20, 10, 0),      new Vector(20, 30, 0),      new Vector(10, 30, 0)
+                                };
 
         /**
          * Array with control points for the custom track.
@@ -798,8 +811,10 @@ public class RobotRace extends Base {
                         for (double t = 0; t < 1; t += step) {
                             Vector current = getPoint(t);
                             Vector next = getPoint(t + step);
-                            Vector currentPerpendicular = getTangent(t).cross(Vector.Z).normalized();
-                            Vector nextPerpendicular = getTangent(t + step).cross(Vector.Z).normalized();
+                            Vector currentTangent = getTangent(t);
+                            Vector nextTangent = getTangent(t + step);
+                            Vector currentPerpendicular = currentTangent.cross(Vector.Z).normalized();
+                            Vector nextPerpendicular = nextTangent.cross(Vector.Z).normalized();
                             Vector currentTrackOuter = current.add(currentPerpendicular.scale(2)).add(Vector.Z);
                             Vector currentTrackInner = current.add(currentPerpendicular.scale(-2)).add(Vector.Z);
                             Vector nextTrackOuter = next.add(nextPerpendicular.scale(2)).add(Vector.Z);
@@ -813,7 +828,7 @@ public class RobotRace extends Base {
                             gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
                             gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
                             gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
-                            
+                           
                             gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
                             gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
                             gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
@@ -842,19 +857,64 @@ public class RobotRace extends Base {
                         gl.glCallList(testTrack);
                 }         
             } else if (1 == trackNr) {
-                // code goes here ...
+                 if (oTrack == -1) {
+                    // Generate new list id.
+                    oTrack = gl.glGenLists(1);
+                    // Creates a new display list.
+                    gl.glNewList(oTrack, GL_COMPILE);
+                                                
+                    drawCubicBezier(controlPointsOTrack);
+                                        
+                    gl.glEndList();
+                } else {
+                    gl.glCallList(oTrack);
+                }
+
 
                 // The L-track is selected
             } else if (2 == trackNr) {
-                // code goes here ...
+                 if (lTrack == -1) {
+                    // Generate new list id.
+                    lTrack = gl.glGenLists(1);
+                    // Creates a new display list.
+                    gl.glNewList(lTrack, GL_COMPILE);
+                                                
+                    drawCubicBezier(controlPointsLTrack);
+                                        
+                    gl.glEndList();
+                } else {
+                    gl.glCallList(lTrack);
+                }
 
                 // The C-track is selected
             } else if (3 == trackNr) {
-                // code goes here ...
+                 if (cTrack == -1) {
+                    // Generate new list id.
+                    cTrack = gl.glGenLists(1);
+                    // Creates a new display list.
+                    gl.glNewList(cTrack, GL_COMPILE);
+                                                
+                    drawCubicBezier(controlPointsCTrack);
+                                        
+                    gl.glEndList();
+                } else {
+                    gl.glCallList(cTrack);
+                }
 
                 // The custom track is selected
             } else if (4 == trackNr) {
-                // code goes here ...
+                if (customTrack == -1) {
+                    // Generate new list id.
+                    customTrack = gl.glGenLists(1);
+                    // Creates a new display list.
+                    gl.glNewList(customTrack, GL_COMPILE);
+                                                
+                    drawCubicBezier(controlPointsCustomTrack);
+                                        
+                    gl.glEndList();
+                } else {
+                    gl.glCallList(customTrack);
+                }
 
             }
         }
@@ -875,6 +935,90 @@ public class RobotRace extends Base {
             return new Vector(  20*Math.PI*-Math.sin(2*Math.PI*t), 
                                 28*Math.PI*Math.cos(2*Math.PI*t), 
                                 1);
+        }
+        
+        //http://en.wikipedia.org/wiki/B%C3%A9zier_curve
+        //B(t) = (1-t)^3 * Point0 + 3 * (1-t)^2 * t * Point 1 + 3 * (1-t) * t^2 * Point2 + t^3 * Point3
+        public Vector getCubicBezierPnt(double t, Vector Point0, Vector Point1, Vector Point2, Vector Point3) {
+             return new Vector( Math.pow(1 - t, 3) * Point0.x() + 3 * Math.pow(1 - t, 2) * t * Point1.x() + 3 * (1 - t) * Math.pow(t, 2)
+                                * Point2.x() + Math.pow(t, 3) * Point3.x(), 
+                                Math.pow(1 - t, 3) * Point0.y() + 3 * Math.pow(1 - t, 2) * t * Point1.y() + 3 * (1 - t) * Math.pow(t, 2)
+                                * Point2.y() + Math.pow(t, 3) * Point3.y(), 
+                                Math.pow(1 - t, 3) * Point0.z() + 3 * Math.pow(1 - t, 2) * t * Point1.z() + 3 * (1 - t) * Math.pow(t, 2)
+                                * Point2.z() + Math.pow(t, 3) * Point3.z());
+        }
+        
+        public Vector getCubicBezierTng(double t, Vector Point0, Vector Point1, Vector Point2, Vector Point3) {
+            return new Vector(  (3 * Math.pow(1 - t, 2) * (Point1.x() - Point0.x())) + (6 * (1 - t) * t * (Point2.x() 
+                                - Point1.x())) + (3 * Math.pow(t, 2) * (Point3.x() - Point2.x())),
+                                (3 * Math.pow(1 - t, 2) * (Point1.y() - Point0.y())) + (6 * (1 - t) * t * (Point2.y() 
+                                - Point1.y())) + (3 * Math.pow(t, 2) * (Point3.y() - Point2.y())),
+                                (3 * Math.pow(1 - t, 2) * (Point1.z() - Point0.z())) + (6 * (1 - t) * t * (Point2.z() 
+                                - Point1.z())) + (3 * Math.pow(t, 2) * (Point3.z() - Point2.z())));
+         }
+        
+        public void drawCubicBezier(Vector[] controlPoints){
+            double numberOfSteps = 200;
+            double step = 1 / numberOfSteps;
+            
+            gl.glBegin(GL_TRIANGLES);
+                                        for (int i = 0; i < controlPoints.length; i += 4){
+                                            for (double t = 0; t < 1; t += step) {
+                                                        // Calculates the first point.
+                                                        Vector current = getCubicBezierPnt(t, controlPoints[i+0],
+                                                                        controlPoints[i+1], controlPoints[i+2],
+                                                                        controlPoints[i+3]);
+                                                        // Calculates the second point.
+                                                        Vector next = getCubicBezierPnt(t + step, controlPoints[i+0],
+                                                                        controlPoints[i+1], controlPoints[i+2],
+                                                                        controlPoints[i+3]);
+                                                        // Calculates the normal to the first point.
+                                                        Vector currentPerpendicular = getCubicBezierTng(t, controlPoints[i+0],
+                                                                        controlPoints[i+1], controlPoints[i+2],
+                                                                        controlPoints[i+3]).cross(Vector.Z).normalized();
+                                                        // Calculates the normal to the second point.
+                                                        Vector nextPerpendicular = getCubicBezierTng(t + step, controlPoints[i+0],
+                                                                        controlPoints[i+1], controlPoints[i+2],
+                                                                        controlPoints[i+3]).cross(Vector.Z).normalized();
+                                                        // Calculates all the vertices of the intersection of the track at the first point.
+                                                        
+                                                        Vector currentTrackOuter = current.add(currentPerpendicular.scale(2)).add(Vector.Z);
+                                                        Vector currentTrackInner = current.add(currentPerpendicular.scale(-2)).add(Vector.Z);
+                            Vector nextTrackOuter = next.add(nextPerpendicular.scale(2)).add(Vector.Z);
+                            Vector nextTrackInner = next.add(nextPerpendicular.scale(-2)).add(Vector.Z);
+                            
+                            Vector currentBaseOuter = current.add(currentPerpendicular.scale(2));
+                            Vector currentBaseInner = current.add(currentPerpendicular.scale(-2));
+                            Vector nextBaseOuter = next.add(nextPerpendicular.scale(2));
+                            Vector nextBaseInner = next.add(nextPerpendicular.scale(-2));
+                                                        
+                                                        gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
+                                                        gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
+                                                        gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
+                           
+                                                        gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
+                                                        gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
+                                                        gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
+                                                        
+                                                        gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
+                                                        gl.glVertex3d(currentBaseOuter.x(), currentBaseOuter.y(), currentBaseOuter.z());
+                                                        gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
+                                    
+                                                        gl.glVertex3d(currentBaseOuter.x(), currentBaseOuter.y(), currentBaseOuter.z());
+                                                        gl.glVertex3d(nextBaseOuter.x(), nextBaseOuter.y(), nextBaseOuter.z());
+                                                        gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
+                            
+                                                        gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
+                                                        gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
+                                                        gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
+                            
+                                                        gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
+                                                        gl.glVertex3d(currentBaseInner.x(), currentBaseInner.y(), currentBaseInner.z());
+                                                        gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
+                                                }
+                                        }
+                                        gl.glEnd();
+        
         }
 
     }
