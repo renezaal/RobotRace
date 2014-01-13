@@ -31,13 +31,18 @@ public class Terrain {
     }
     
     private int displayListIndex= 1;
+    private double size=20.0;
     
     private void prepare(){
         pre();
         
         
         gl.glNewList(displayListIndex, GL_COMPILE);
-        
+        RobotRace.Material.GREEN.use(gl);
+        gl.glVertex3d(size, size,0);
+        gl.glVertex3d(size, -size,0);
+        gl.glVertex3d(-size, -size,0);
+        gl.glVertex3d(-size, size,0);
         gl.glEndList();
     }
     
@@ -45,5 +50,9 @@ public class Terrain {
         pre();
         
         gl.glCallList(displayListIndex);
+    }
+    
+    public double GetHeightAt(double x,double y){
+        return 1.0;
     }
 }

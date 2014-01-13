@@ -83,7 +83,7 @@ public class RobotRace extends Base {
         // Create a new array of four robots
         robots = new Robot[4];
 
-        // Initialize robot 0
+        // Initialize robots
         for (int i = 0; i < 4; i++) {
             robots[i] = new Robot(Material.GOLD, new Vector(0, i * 10, 0), new Vector(0, 1, 0), this);
         }
@@ -132,6 +132,8 @@ public class RobotRace extends Base {
         // add ambient light
         float ambientLight[] = new float[]{0.8f, 0.8f, 0.8f, 0.5f};
         gl.glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight, 0);
+        
+        gl.glDisable(GL_CULL_FACE);
     }
 
     /**
@@ -279,9 +281,7 @@ public class RobotRace extends Base {
         if (gs.showAxes) {
 
             // draw a red arrow along the X-axis
-            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Material.RED.diffuse, 0);
-            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.RED.specular, 0);
-            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, Material.RED.shinyness, 0);
+            Material.RED.use(gl);
             cd.Rectangle(2f, 0, 0, 0.1f);
 
             // draw a cone at the end
@@ -291,9 +291,7 @@ public class RobotRace extends Base {
             gl.glPopMatrix();
 
             // draw a green arrow along the Y-axis
-            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Material.GREEN.diffuse, 0);
-            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.GREEN.specular, 0);
-            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, Material.GREEN.shinyness, 0);
+            Material.GREEN.use(gl);
             cd.Rectangle(0, 2f, 0, 0.1f);
 
             // draw a cone at the end
@@ -303,9 +301,7 @@ public class RobotRace extends Base {
             gl.glPopMatrix();
 
             // draw a blue arrow along the Z-axis
-            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Material.BLUE.diffuse, 0);
-            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.BLUE.specular, 0);
-            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, Material.BLUE.shinyness, 0);
+            Material.BLUE.use(gl);
             cd.Rectangle(0, 0, 2f, 0.1f);
 
             // draw a cone at the end
@@ -315,9 +311,7 @@ public class RobotRace extends Base {
             gl.glPopMatrix();
 
             // draw a yellow orb at the origin
-            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, Material.YELLOW.diffuse, 0);
-            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.YELLOW.specular, 0);
-            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, Material.YELLOW.shinyness, 0);
+            Material.YELLOW.use(gl);
             glut.glutSolidSphere(0.2f, 20, 10);
         }
     }

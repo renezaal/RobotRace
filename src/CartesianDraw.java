@@ -27,10 +27,10 @@ public class CartesianDraw {
         glu = rr.getGLU();
         glut = rr.getGLUT();
     }
-    
+
     // alternate parameterization of the Orb method
     public void Orb(Vector v, float radius, int detail) {
-        Orb((float)v.x(), (float)v.y(), (float)v.z(), radius, detail);
+        Orb((float) v.x(), (float) v.y(), (float) v.z(), radius, detail);
     }
 
     // alternate parameterization of the Orb method
@@ -50,7 +50,6 @@ public class CartesianDraw {
         gl.glPopMatrix();
     }
 
-    
     // alternate parameterization of the Orb method
     public void Orb(float x1, float y1, float z1, float x2, float y2, float z2, float radius, int detail) {
         pre();
@@ -73,7 +72,6 @@ public class CartesianDraw {
 
     }
 
-    
     // alternate parameterization of the Rectangle method
     public void Rectangle(float x2, float y2, float z2, float radius) {
         Rectangle(0, 0, 0, x2, y2, z2, radius);
@@ -88,7 +86,8 @@ public class CartesianDraw {
         // use the transform method to ease troubles
         Transform(x1, y1, z1, x2, y2, z2, radius);
         // draw the cube
-        glut.glutSolidCube(1f);
+//        glut.glutSolidCube(1f);
+        cube();
         gl.glPopMatrix();
     }
 
@@ -180,7 +179,7 @@ public class CartesianDraw {
      the length of the second limb
      and the direction of the joint
     
-    this method saves a lot of time if you wish to animate appendages with joints.
+     this method saves a lot of time if you wish to animate appendages with joints.
      */
     public void Joint(float x1, float y1, float z1, float x2, float y2, float z2, float firstLimbLength, float secondLimbLength, Vector jointDirection, Shape firstLimbShape, Shape jointShape, Shape secondLimbShape, float radius, int detail) {
         pre();
@@ -191,7 +190,7 @@ public class CartesianDraw {
 
         // the distance between the start and the end
         float separation = (float) Math.sqrt(x3 * x3 + y3 * y3 + z3 * z3);
-        
+
         // if the distance is larger than the combined length of the limbs, we assume the combined length as the distance and just draw a straight appendage
         Boolean separationTooLarge = separation >= (firstLimbLength + secondLimbLength);
 
@@ -228,7 +227,7 @@ public class CartesianDraw {
 
         // the angle between the vector in the direction of the knee and the vector from the start to the end
         double beta = Math.toDegrees(Math.acos(directionalUnitVector.dot(startToEnd.normalized())));
-        
+
         // if we substract 90 degrees from beta the result is the angle between the vector orthogonal to the knee direction and the vector from the start to the end
         // if we then substract the resulting angle from the angle between the first limb and the vector from start to end, we get the angle of the first limb to our "x-axis"
         double gamma = alpha - (beta - 90d);
@@ -277,16 +276,84 @@ public class CartesianDraw {
                 glut.glutSolidSphere(0.5f, detail, detail / 2);
                 break;
             case Rectangle:
-                glut.glutSolidCube(1f);
+//                glut.glutSolidCube(1f);
+                cube();
                 break;
         }
     }
-    
-    private void cube(){
+
+    private void cube() {
+        pre();
+        cube(null);
+    }
+
+    private void cube(Texture t) {
+        gl.glPushMatrix();
+        Vector vtlf = new Vector(-0.5, 0.5, 0.5);
+        Vector vtrf = new Vector(0.5, 0.5, 0.5);
+        Vector vtrn = new Vector(0.5, -0.5, 0.5);
+        Vector vtln = new Vector(-0.5, -0.5, 0.5);
+        Vector vblf = new Vector(-0.5, 0.5, -0.5);
+        Vector vbrf = new Vector(0.5, 0.5, -0.5);
+        Vector vbrn = new Vector(0.5, -0.5, -0.5);
+        Vector vbln = new Vector(-0.5, -0.5, -0.5);
+
+        Vector normalLeft = Vector.X.scale(-1);
+        Vector normalRight = Vector.X;
+        Vector normalBottom = Vector.Z.scale(-1);
+        Vector normalTop = Vector.Z;
+        Vector normalFront = Vector.Y.scale(-1);
+        Vector normalBack = Vector.Y;
+
+        if (t == null) {
+            drawQuad(vblf, vtlf, vtln, vbln, normalLeft);
+            drawQuad(vblf, vbrf, vtrf, vtlf, normalBack);
+            drawQuad(vtlf, vtrf, vtrn, vtln, normalTop);
+            drawQuad(vtln, vtrn, vbrn, vbln, normalFront);
+            drawQuad(vtrf, vbrf, vbrn, vtrn, normalRight);
+            drawQuad(vbrf, vbrn, vbln, vblf, normalBottom);
+        } else {
+            drawQuad(vblf, vtlf, vtln, vbln, normalLeft, t, 0, 0.333, 0.25, 0.666);
+            drawQuad(vblf, vbrf, vtrf, vtlf, normalBack, t, 0.25, 0.0, 0.5, 0.333);
+            drawQuad(vtlf, vtrf, vtrn, vtln, normalTop, t, 0.25, 0.333, 0.50, 0.666);
+            drawQuad(vtln, vtrn, vbrn, vbln, normalFront, t, 0.25, 0.666, 0.5, 1);
+            drawQuad(vtrf, vbrf, vbrn, vtrn, normalRight, t, 0.5, 0.333, 0.75, 0.666);
+            drawQuad(vbrf, vbrn, vbln, vblf, normalBottom, t, 0.75, 0.333, 1, 0.666);
+        }
+        gl.glPopMatrix();
+    }
+
+    private void drawQuad(Vector v1, Vector v2, Vector v3, Vector v4, Vector normal) {
         gl.glBegin(GL_QUADS);
         
+        gl.glNormal3d(normal.x(), normal.y(), normal.z());
         
-        
+        gl.glVertex3d(v1.x(), v1.y(), v1.z());
+        gl.glVertex3d(v2.x(), v2.y(), v2.z());
+        gl.glVertex3d(v3.x(), v3.y(), v3.z());
+        gl.glVertex3d(v4.x(), v4.y(), v4.z());
+
+
+        gl.glEnd();
+    }
+
+    private void drawQuad(Vector v1, Vector v2, Vector v3, Vector v4, Vector normal, Texture t, double startX, double startY, double endX, double endY) {
+        gl.glBegin(GL_QUADS);
+        t.bind(gl);
+        gl.glTexCoord2d(startX, startY);
+        gl.glVertex3d(v1.x(), v1.y(), v1.z());
+
+        gl.glTexCoord2d(endX, startY);
+        gl.glVertex3d(v2.x(), v2.y(), v2.z());
+
+        gl.glTexCoord2d(endX, endY);
+        gl.glVertex3d(v3.x(), v3.y(), v3.z());
+
+        gl.glTexCoord2d(startX, endY);
+        gl.glVertex3d(v4.x(), v4.y(), v4.z());
+
+        gl.glNormal3d(normal.x(), normal.y(), normal.z());
+
         gl.glEnd();
     }
 
