@@ -813,7 +813,9 @@ public class RobotRace extends Base {
                             Vector next = getPoint(t + step);
                             Vector currentTangent = getTangent(t);
                             Vector nextTangent = getTangent(t + step);
+                            
                             Vector currentPerpendicular = currentTangent.cross(Vector.Z).normalized();
+                            Vector currentPerpendicularInner = currentTangent.cross(Vector.Z).normalized().scale(-1);
                             Vector nextPerpendicular = nextTangent.cross(Vector.Z).normalized();
                             Vector currentTrackOuter = current.add(currentPerpendicular.scale(2)).add(Vector.Z);
                             Vector currentTrackInner = current.add(currentPerpendicular.scale(-2)).add(Vector.Z);
@@ -825,6 +827,10 @@ public class RobotRace extends Base {
                             Vector nextBaseOuter = next.add(nextPerpendicular.scale(2));
                             Vector nextBaseInner = next.add(nextPerpendicular.scale(-2));
                             
+                            Vector currentNormal = currentPerpendicular.cross(currentTangent).normalized();
+                                                        
+                            gl.glNormal3d(currentNormal.x(), currentNormal.y(), currentNormal.z());
+                            
                             gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
                             gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
                             gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
@@ -832,7 +838,9 @@ public class RobotRace extends Base {
                             gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
                             gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
                             gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
-                                                        
+                            
+                            gl.glNormal3d(currentPerpendicular.x(), currentPerpendicular.y(), currentPerpendicular.z());
+                            
                             gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
                             gl.glVertex3d(currentBaseOuter.x(), currentBaseOuter.y(), currentBaseOuter.z());
                             gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
@@ -840,6 +848,8 @@ public class RobotRace extends Base {
                             gl.glVertex3d(currentBaseOuter.x(), currentBaseOuter.y(), currentBaseOuter.z());
                             gl.glVertex3d(nextBaseOuter.x(), nextBaseOuter.y(), nextBaseOuter.z());
                             gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
+                            
+                            gl.glNormal3d(currentPerpendicularInner.x(), currentPerpendicularInner.y(), currentPerpendicularInner.z());
                             
                             gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
                             gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
@@ -973,17 +983,21 @@ public class RobotRace extends Base {
                                                                         controlPoints[i+1], controlPoints[i+2],
                                                                         controlPoints[i+3]);
                                                         // Calculates the normal to the first point.
-                                                        Vector currentPerpendicular = getCubicBezierTng(t, controlPoints[i+0],
+                                                        Vector currentTangent = getCubicBezierTng(t, controlPoints[i+0],
                                                                         controlPoints[i+1], controlPoints[i+2],
-                                                                        controlPoints[i+3]).cross(Vector.Z).normalized();
+                                                                        controlPoints[i+3]);
                                                         // Calculates the normal to the second point.
-                                                        Vector nextPerpendicular = getCubicBezierTng(t + step, controlPoints[i+0],
+                                                        Vector nextTangent = getCubicBezierTng(t + step, controlPoints[i+0],
                                                                         controlPoints[i+1], controlPoints[i+2],
-                                                                        controlPoints[i+3]).cross(Vector.Z).normalized();
+                                                                        controlPoints[i+3]);
                                                         // Calculates all the vertices of the intersection of the track at the first point.
                                                         
-                                                        Vector currentTrackOuter = current.add(currentPerpendicular.scale(2)).add(Vector.Z);
-                                                        Vector currentTrackInner = current.add(currentPerpendicular.scale(-2)).add(Vector.Z);
+                                                        
+                            Vector currentPerpendicular = currentTangent.cross(Vector.Z).normalized();
+                            Vector currentPerpendicularInner = currentTangent.cross(Vector.Z).normalized().scale(-1);
+                            Vector nextPerpendicular = nextTangent.cross(Vector.Z).normalized();
+                            Vector currentTrackOuter = current.add(currentPerpendicular.scale(2)).add(Vector.Z);
+                            Vector currentTrackInner = current.add(currentPerpendicular.scale(-2)).add(Vector.Z);
                             Vector nextTrackOuter = next.add(nextPerpendicular.scale(2)).add(Vector.Z);
                             Vector nextTrackInner = next.add(nextPerpendicular.scale(-2)).add(Vector.Z);
                             
@@ -991,30 +1005,38 @@ public class RobotRace extends Base {
                             Vector currentBaseInner = current.add(currentPerpendicular.scale(-2));
                             Vector nextBaseOuter = next.add(nextPerpendicular.scale(2));
                             Vector nextBaseInner = next.add(nextPerpendicular.scale(-2));
+                            
+                            Vector currentNormal = currentPerpendicular.cross(currentTangent).normalized();
                                                         
-                                                        gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
-                                                        gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
-                                                        gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
+                            gl.glNormal3d(currentNormal.x(), currentNormal.y(), currentNormal.z());
+                            
+                            gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
+                            gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
+                            gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
                            
-                                                        gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
-                                                        gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
-                                                        gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
-                                                        
-                                                        gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
-                                                        gl.glVertex3d(currentBaseOuter.x(), currentBaseOuter.y(), currentBaseOuter.z());
-                                                        gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
+                            gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
+                            gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
+                            gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
+                            
+                            gl.glNormal3d(currentPerpendicular.x(), currentPerpendicular.y(), currentPerpendicular.z());
+                            
+                            gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
+                            gl.glVertex3d(currentBaseOuter.x(), currentBaseOuter.y(), currentBaseOuter.z());
+                            gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
                                     
-                                                        gl.glVertex3d(currentBaseOuter.x(), currentBaseOuter.y(), currentBaseOuter.z());
-                                                        gl.glVertex3d(nextBaseOuter.x(), nextBaseOuter.y(), nextBaseOuter.z());
-                                                        gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
+                            gl.glVertex3d(currentBaseOuter.x(), currentBaseOuter.y(), currentBaseOuter.z());
+                            gl.glVertex3d(nextBaseOuter.x(), nextBaseOuter.y(), nextBaseOuter.z());
+                            gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
                             
-                                                        gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
-                                                        gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
-                                                        gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
+                            gl.glNormal3d(currentPerpendicularInner.x(), currentPerpendicularInner.y(), currentPerpendicularInner.z());
                             
-                                                        gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
-                                                        gl.glVertex3d(currentBaseInner.x(), currentBaseInner.y(), currentBaseInner.z());
-                                                        gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
+                            gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
+                            gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
+                            gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
+                            
+                            gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
+                            gl.glVertex3d(currentBaseInner.x(), currentBaseInner.y(), currentBaseInner.z());
+                            gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
                                                 }
                                         }
                                         gl.glEnd();
