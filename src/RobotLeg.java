@@ -57,7 +57,39 @@ public class RobotLeg {
         return front;
     }
 
+    private void setStep(Vector target) {
+
+        // we're leaving ground
+        onTheGround = false;
+        // the target of the step is located in the new neutral zone
+        stepTarget = target;
+        stepStart = footProjection;
+        // the maximum distance is randomized a bit
+        maxDistance = (Math.random() * 0.5) + 0.5;
+        // the starting point is where the foot is now. 
+        stepStart = footProjection;
+        // we just started moving
+        stepStartTime = 0;
+    }
+    
+    private double stepLengthMem;
+    private double timeMem;
+    private double stepLength(double time){
+        if (time==timeMem) {
+            return stepLengthMem;
+        }
+            // calculate the total length of this step
+            double stepLength = stepStart.subtract(stepTarget).length();
+            if (stepLength<0.001) {
+                stepLength=0;
+            }
+            
+            return stepLength;
+    }
+
     public void Advance(Vector newNeutral, Vector attachment) {
+            // get the time since the last render from the robotrace class
+            double time = rr.getTime();
         // regulate the loop
         if (onTheGround) {
             // keep track of the amount of time this foot has stood still
@@ -68,33 +100,24 @@ public class RobotLeg {
             if (distance > maxDistance) {
                 // if it's farther away than the allowed distance, it has got to move towards the new point.
                 // for that it has to leave the ground
-                onTheGround = false;
-                // the target of the step is located in the new neutral zone
-                stepTarget = newNeutral.add(newNeutral.subtract(new Vector(footProjection.x(),footProjection.y(),0)).normalized().scale(maxDistance / 2.0));
-                stepStart = footProjection;
+                
+                setStep(newNeutral.add(newNeutral.subtract(new Vector(footProjection.x(), footProjection.y(), 0)).normalized().scale(maxDistance / 2.0)));
             } else {
                 // this is a restless robot
                 if (relaxTimer > maxRelaxTime) {
                     // we'll give a little randomness to the time it takes to relax
                     maxRelaxTime = (Math.random() * 2.0) + 1.0;
-                    // we're leaving ground
-                    onTheGround = false;
-                    // the target of the step is the middle of the neutral zone
-                    stepTarget = newNeutral;
-                    // the starting point is where the foot is now. It is done like this to avoid unwelcome pointers
-                    stepStart = Vector.O.add(footProjection);
-                    // the maximum distance is also randomized a bit
-                    maxDistance = (Math.random() * 0.5) + 0.5;
-                    // we just started moving
-                    stepStartTime = 0;
+                    
+                    setStep(newNeutral);
                 }
             }
         } else {
             // if we're moving, we're not relaxing
             relaxTimer = 0;
-
+            
+            
             // if the foot is near the target or too low, we'll assume it's made it to teh target
-            if (stepStart.subtract(footProjection).length() > stepStart.subtract(stepTarget).length()) {
+            if ((stepLength(time)==0&&stepStartTime>0.5) || (stepLength(time)>0&&stepStart.subtract(footProjection).length() > stepStart.subtract(stepTarget).length())) {
                 // and reset it's height to be sure
                 footProjection = new Vector(footProjection.x(), footProjection.y(), newNeutral.z());
                 // so it's on the ground now
@@ -104,27 +127,24 @@ public class RobotLeg {
 
         // give the coordinates to the foot
         if (!onTheGround) {
-            // get the time since the last render from the robotrace class
-            double time = rr.getTime();
+            relaxTimer = 0;
             // calculate the direction in which the foot should move, do not bother with the z value
             Vector stepDirection = stepTarget.subtract(footProjection).normalized();
-            // calculate the total length of this step
-            double stepLength = stepStart.subtract(stepTarget).length();
             // move the foot toward the target
-            footProjection = footProjection.add(stepDirection.scale( time*time+(10.0 *stepLength*time)));
+            footProjection = footProjection.add(stepDirection.scale(time * time + (4.0 * stepLength(time) * time)));
 // calculate the distance the foot has moved since the start of the step. again, don't bother with the z value
             double distanceMoved = stepStart.subtract(footProjection).length();
             // instantiate the variable that is going to contain the z value of the foot
             double footZ;
 
-            if (stepLength == 0) {
+            if (stepLength(time) == 0) {
                 stepStartTime += time;
-                footZ = (1.0 - Math.pow((time / 0.5) - 1.0, 2))*0.3;
-            } else if (distanceMoved > stepLength) {
+                footZ = (1.0 - Math.pow((stepStartTime / 0.25) - 1.0, 2)) * 0.3;
+            } else if (distanceMoved > stepLength(time)) {
                 // if we've moved beyond our target we don't modify the height
                 footZ = 0;
             } else {
-                footZ = (1.0 - Math.pow(((distanceMoved / stepLength) * 2) - 1.0, 2))*0.3;
+                footZ = (1.0 - Math.pow(((distanceMoved / stepLength(time)) * 2) - 1.0, 2)) * 0.3;
             }
             foot = footProjection.add(Vector.Z.scale(footZ));
         }

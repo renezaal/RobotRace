@@ -96,7 +96,7 @@ public class RobotRace extends Base {
         raceTrack = new RaceTrack();
 
         // Initialize the terrain
-        terrain = new Terrain();
+        terrain = new Terrain(this);
     }
 
     /**
@@ -255,22 +255,7 @@ public class RobotRace extends Base {
         raceTrack.draw(gs.trackNr);
 
         // Draw terrain
-        terrain.draw();
-
-        // Unit box around origin.
-        glut.glutWireCube(1f);
-
-        // Move in x-direction.
-        gl.glTranslatef(2f, 0f, 0f);
-
-        // Rotate 30 degrees, around z-axis.
-        gl.glRotatef(30f, 0f, 0f, 1f);
-
-        // Scale in z-direction.
-        gl.glScalef(1f, 1f, 2f);
-
-        // Translated, rotated, scaled box.
-        glut.glutWireCube(1f);
+        terrain.Draw();
     }
 
     /**
@@ -343,10 +328,29 @@ public class RobotRace extends Base {
                 new float[]{0.227f, 0.13f, 0.065f, 1.0f},
                 new float[]{0.3f, 0.14f, 0.071f, 1.0f},
                 new float[]{2f}),
+        /*
+        Transparent blue flickering color to emulate some sort of forcefield
+        */
         FORCEFIELD(
                 forceFieldColor(),
                 forceFieldColor(),
                 new float[]{0f}
+        ),
+        /*
+        Water color
+        */
+        WATER(
+                new float[]{0.50754f, 0.50754f, 0.50754f, 0.5f},
+                new float[]{0.508273f, 0.508273f, 0.508273f, 0.3f},
+                new float[]{80f}
+        ),
+        /*
+        Nice clear material for non-interference with textures
+        */
+        NONE(
+                new float[]{1f, 1f, 1f, 1f},
+                new float[]{1f, 1f, 1f, 1f},
+                new float[]{10f}
         ),
         /**
          * Orange material properties.
@@ -359,8 +363,8 @@ public class RobotRace extends Base {
          * Yellow material properties.
          */
         YELLOW(
-                new float[]{0f, 1f, 1f, 1.0f},
-                new float[]{0f, 1f, 1f, 1.0f},
+                new float[]{1f, 1f, 0f, 1.0f},
+                new float[]{1f, 1f, 0f, 1.0f},
                 new float[]{20f}),
         /**
          * Blue material properties.
@@ -1048,33 +1052,6 @@ public class RobotRace extends Base {
         
         }
 
-    }
-
-    /**
-     * Implementation of the terrain.
-     */
-    private class Terrain {
-
-        /**
-         * Can be used to set up a display list.
-         */
-        public Terrain() {
-            // code goes here ...
-        }
-
-        /**
-         * Draws the terrain.
-         */
-        public void draw() {
-            // code goes here ...
-        }
-
-        /**
-         * Computes the elevation of the terrain at ({@code x}, {@code y}).
-         */
-        public float heightAt(float x, float y) {
-            return 0; // <- code goes here
-        }
     }
 
     /**
