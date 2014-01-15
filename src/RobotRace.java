@@ -3,6 +3,7 @@ import com.jogamp.opengl.util.gl2.GLUT;
 import com.jogamp.opengl.util.texture.Texture;
 import java.awt.geom.Point2D;
 import java.util.Date;
+import static javax.media.opengl.GL.GL_TEXTURE_2D;
 import static javax.media.opengl.GL.GL_TRIANGLES;
 import javax.media.opengl.GL2;
 import static javax.media.opengl.GL2.*;
@@ -890,8 +891,10 @@ public class RobotRace extends Base {
                             gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
                             
                             
+                            
                         }
                         gl.glEnd();
+                        gl.glDisable(GL_TEXTURE_2D);
                         gl.glEndList();
                         testTrackDistance=distance;
                 } else {
@@ -1084,36 +1087,62 @@ public class RobotRace extends Base {
                                                         
                             gl.glNormal3d(currentNormal.x(), currentNormal.y(), currentNormal.z());
                             
+                            Material.NONE.use(gl);
+
+                            gl.glEnable(GL_TEXTURE_2D);
+                            track.bind(gl);
+                            gl.glTexCoord2d(1, 0);
                             gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
+                            gl.glTexCoord2d(1, 1);
                             gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
+                            gl.glTexCoord2d(0, 1);
                             gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
                            
+                            gl.glTexCoord2d(1, 1);
                             gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
+                            gl.glTexCoord2d(0, 0);
                             gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
+                            gl.glTexCoord2d(0, 1);
                             gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
                             
                             gl.glNormal3d(currentPerpendicular.x(), currentPerpendicular.y(), currentPerpendicular.z());
-                            
+                            brick.bind(gl);
+                            gl.glTexCoord2d(0, 1);
                             gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
+                            gl.glTexCoord2d(0, 0);
                             gl.glVertex3d(currentBaseOuter.x(), currentBaseOuter.y(), currentBaseOuter.z());
+                            gl.glTexCoord2d(1, 1);
                             gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
-                                    
+                            
+                            gl.glTexCoord2d(0, 0);
                             gl.glVertex3d(currentBaseOuter.x(), currentBaseOuter.y(), currentBaseOuter.z());
+                            gl.glTexCoord2d(1, 0);
                             gl.glVertex3d(nextBaseOuter.x(), nextBaseOuter.y(), nextBaseOuter.z());
+                            gl.glTexCoord2d(1, 1);
                             gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
                             
                             gl.glNormal3d(currentPerpendicularInner.x(), currentPerpendicularInner.y(), currentPerpendicularInner.z());
                             
+                            gl.glTexCoord2d(0, 1);
                             gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
+                            gl.glTexCoord2d(1, 0);
                             gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
+                            gl.glTexCoord2d(1, 1);
                             gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
                             
+                            gl.glTexCoord2d(0, 1);
                             gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
+                            gl.glTexCoord2d(0, 0);
                             gl.glVertex3d(currentBaseInner.x(), currentBaseInner.y(), currentBaseInner.z());
+                            gl.glTexCoord2d(1, 0);
                             gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
-                                                }
-                                        }
-                                        gl.glEnd();
+                            
+                            
+                                                
+                             }
+                          }
+                    gl.glEnd();
+                    gl.glDisable(GL_TEXTURE_2D);
         
         }
 
