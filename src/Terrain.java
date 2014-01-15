@@ -54,11 +54,11 @@ public class Terrain {
         pre();
 
         Color[] colors = new Color[5];
-        colors[0] = Color.BLUE;
-        colors[1] = Color.YELLOW;
-        colors[2] = Color.GREEN;
-        colors[3] = Color.GREEN.darker();
-        colors[4] = Color.LIGHT_GRAY;
+        colors[0] = new Color(122, 184, 217);
+        colors[1] = new Color(232, 203, 126);
+        colors[2] = new Color(135, 191, 118);
+        colors[3] = new Color(102, 131, 92);
+        colors[4] = new Color(70, 79, 68);
         OneDColorId = OneDTextureInit.create1DTexture(gl, colors);
 
         displayListIndex = gl.glGenLists(1);
