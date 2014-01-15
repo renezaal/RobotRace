@@ -801,23 +801,24 @@ public class RobotRace extends Base {
          * Draws this track, based on the selected track number.
          */
         public void draw(int trackNr) {
-           distance = 0;
-           lastTrackNr=trackNr;
+           
+            lastTrackNr=trackNr;
             double numberOfSteps = 200;
             double step = 1 / numberOfSteps;
             
             // The test track is selected
             if (0 == trackNr) {
                 if (testTrack == -1) {
+                   distance = 0;
                    testTrack = gl.glGenLists(1);
                    gl.glNewList(testTrack, GL_COMPILE);
                    
                    gl.glBegin(GL_TRIANGLES);
                         for (double t = 0; t < 1; t += step) {
-                            Vector current = getPoint(t);
-                            Vector next = getPoint(t + step);
-                            Vector currentTangent = getTangent(t);
-                            Vector nextTangent = getTangent(t + step);
+                            Vector current = testTrackGetPoint(t);
+                            Vector next = testTrackGetPoint(t + step);
+                            Vector currentTangent = testTrackGetTangent(t);
+                            Vector nextTangent = testTrackGetTangent(t + step);
                             
                             distance += Math.sqrt(Math.pow(next.x()-current.x(),2) + Math.pow(next.y()-current.y(),2) + Math.pow(next.z()-current.z(),2));
                                                    
@@ -877,7 +878,7 @@ public class RobotRace extends Base {
             } else if (1 == trackNr) {
                  if (oTrack == -1) {
                     // Generate new list id.
-                    oTrack = gl.glGenLists(1);
+                    oTrack = gl.glGenLists(2);
                     // Creates a new display list.
                     gl.glNewList(oTrack, GL_COMPILE);
                                                 
@@ -948,6 +949,12 @@ public class RobotRace extends Base {
         /**
          * Returns the position of the curve at 0 <= {@code t} <= 1.
          */
+        private Vector testTrackGetPoint(double t) {
+           return new Vector(  10*Math.cos(2*Math.PI*t),
+                                14*Math.sin(2*Math.PI*t),
+                                0);
+        }
+        
         public Vector getPoint(double t) {
             t=t/getDistance();
             t%=1;
@@ -959,6 +966,12 @@ public class RobotRace extends Base {
         /**
          * Returns the tangent of the curve at 0 <= {@code t} <= 1.
          */
+        private Vector testTrackGetTangent(double t) {
+            return new Vector(  20*Math.PI*-Math.sin(2*Math.PI*t), 
+                                28*Math.PI*Math.cos(2*Math.PI*t), 
+                                0);
+        }
+        
         public Vector getTangent(double t) {
             t=t/getDistance();
             t%=1;
