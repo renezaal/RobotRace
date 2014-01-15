@@ -756,7 +756,7 @@ public class RobotRace extends Base {
         int customTrack = -1;
         double customTrackDistance=0;
         double distance=0;
-        int lastTrackNr=-1;
+        int lastTrackNr=0;
         
         /**
          * Array with control points for the O-track.
@@ -983,11 +983,53 @@ public class RobotRace extends Base {
         public Vector getPoint(double t) {
             t=t/getDistance();
             t%=1;
+            if (lastTrackNr==0) {
+                
             return new Vector(  10*Math.cos(2*Math.PI*t),
                                 14*Math.sin(2*Math.PI*t),
                                 1);
+            } else {
+                return getPointOnBezierTrack(t, getTrack());
+            }
         }
+        
+        
+        // gets a point on a bezier track
+        private Vector getPointOnBezierTrack(double t,Vector[] track){
+            // get the number of points the track exists of
+           double parts = track.length;
+           // divide by four to get the number of parts
+           parts/=4.0;
+           // decide which part is the one to use by rounding down parts*t
+           int part = (int)(parts*t);
+           // calculate the size of a part compared to the whole
+           double partSize = 1.0/parts;
+           // modulate t to be smaller that a partSize, essentialy discarding all uninteresting parts
+           t%=partSize;
+           // divide by the partsize to know where on the current part this is
+           t/=partSize;
+           // call the getCubicBezierPnt method with our newly found values
+           return getCubicBezierPnt(t,track[part],track[part+1],track[part+2],track[part+3]).add(Vector.Z.scale(1));
+                   }
 
+        // gets the tangent for a certain point on a bezier track
+        private Vector getTangentOnBezierTrack(double t,Vector[] track){
+            // get the number of points the track exists of
+           double parts = track.length;
+           // divide by four to get the number of parts
+           parts/=4.0;
+           // decide which part is the one to use by rounding down parts*t
+           int part = (int)(parts*t);
+           // calculate the size of a part compared to the whole
+           double partSize = 1.0/parts;
+           // modulate t to be smaller that a partSize, essentialy discarding all uninteresting parts
+           t%=partSize;
+           // divide by the partsize to know where on the current part this is
+           t/=partSize;
+           // call the getCubicBezierPnt method with our newly found values
+           return getCubicBezierTng(t,track[part],track[part+1],track[part+2],track[part+3]);
+                   }
+        
         /**
          * Returns the tangent of the curve at 0 <= {@code t} <= 1.
          */
@@ -1000,9 +1042,14 @@ public class RobotRace extends Base {
         public Vector getTangent(double t) {
             t=t/getDistance();
             t%=1;
+            if (lastTrackNr==0) {
+                
             return new Vector(  20*Math.PI*-Math.sin(2*Math.PI*t), 
                                 28*Math.PI*Math.cos(2*Math.PI*t), 
                                 1).normalized();
+            } else    {
+                return getTangentOnBezierTrack(t, getTrack());
+            }
         }
         
         private double getDistance(){
@@ -1019,6 +1066,21 @@ public class RobotRace extends Base {
                     return customTrackDistance;
                 default:
                     return 1d;
+            }
+        }
+        
+        private Vector[] getTrack(){
+            switch(lastTrackNr){
+                case 1:
+                    return controlPointsOTrack;
+                case 2:
+                    return controlPointsLTrack;
+                case 3:
+                    return controlPointsCTrack;
+                case 4:
+                    return controlPointsCustomTrack;
+                default:
+                    return null;
             }
         }
         
