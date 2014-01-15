@@ -34,7 +34,7 @@ public class RobotLeg {
     private Vector neutral;
     private double relaxTimer = 0;
     private double maxRelaxTime = 2.0;
-    private double maxDistance = 0.4;
+    private double maxDistance = 0.1;
     private Vector stepTarget = Vector.O;
     private Vector footProjection;
     private Vector foot;
@@ -42,8 +42,8 @@ public class RobotLeg {
     private double stepStartTime = 0;
     private boolean rightLeg;
     private boolean front;
-    private double upperLegLength = 1.3;
-    private double lowerLegLength = 2.3;
+    private double upperLegLength = 0.325;
+    private double lowerLegLength = 0.575;
 
     private void pre() {
         gl = rr.getGL();
@@ -67,7 +67,7 @@ public class RobotLeg {
         stepTarget = target;
         stepStart = footProjection;
         // the maximum distance is randomized a bit
-        maxDistance = (Math.random() * 0.5) + 0.5;
+        maxDistance = (Math.random() * 0.125) + 0.125;
         // the starting point is where the foot is now. 
         stepStart = footProjection;
         // we just started moving
@@ -139,7 +139,7 @@ public class RobotLeg {
             // calculate the direction in which the foot should move, do not bother with the z value
             Vector stepDirection = stepTarget.subtract(footProjection).normalized();
             // move the foot toward the target
-            footProjection = footProjection.add(stepDirection.scale(time * time + (4.0 * stepLength(time) * time)));
+            footProjection = footProjection.add(stepDirection.scale((4.0*stepLength(time) * time)+(time*time)+(2.0*time)));
 // calculate the distance the foot has moved since the start of the step. again, don't bother with the z value
             double distanceMoved = stepStart.subtract(footProjection).length();
             // instantiate the variable that is going to contain the z value of the foot
@@ -147,12 +147,12 @@ public class RobotLeg {
 
             if (stepLength(time) == 0) {
                 stepStartTime += time;
-                footZ = (1.0 - Math.pow((stepStartTime / 0.25) - 1.0, 2)) * 0.3;
+                footZ = (1.0 - Math.pow((stepStartTime / 0.25) - 1.0, 2)) * 0.075;
             } else if (distanceMoved > stepLength(time)) {
                 // if we've moved beyond our target we don't modify the height
                 footZ = 0;
             } else {
-                footZ = (1.0 - Math.pow(((distanceMoved / stepLength(time)) * 2) - 1.0, 2)) * 0.3;
+                footZ = (1.0 - Math.pow(((distanceMoved / stepLength(time)) * 2) - 1.0, 2)) * 0.075;
             }
             foot = footProjection.add(Vector.Z.scale(footZ));
         }
@@ -175,7 +175,7 @@ public class RobotLeg {
                 // shapes of the first limb, knee, second limb
                 CartesianDraw.Shape.Cylinder, CartesianDraw.Shape.Sphere, CartesianDraw.Shape.Cone,
                 // radius and detail level
-                0.14f, 10);
+                0.035f, 10);
 
         gl.glPopMatrix();
     }

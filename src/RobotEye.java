@@ -47,12 +47,16 @@ public class RobotEye {
     private Vector lastIdealPos;
 
     public void Draw(Vector idealPos) {
+        if (Double.isNaN(pos.x())||Double.isNaN(pos.y())||Double.isNaN(pos.z())) {
+            pos=idealPos;
+            movement=Vector.O;
+        }
         pre();
         double drag = 0.01;
         double accelerationMultiplier=1.0;
         // the max distance is when the eye touches the forcefield
         // so the radius of the forcefield minus the radius of the eye and minus a small value to avoid clipping
-        double maxDistance = (0.2-(0.07))-0.01;
+        double maxDistance = (0.05-(0.0175))-0.001;
         Date newTime = new Date();
         int timeE = (int) (newTime.getTime() - time.getTime());
         time=newTime;
@@ -61,7 +65,7 @@ public class RobotEye {
         timeElapsedMax2=timeElapsedMax2%2;
         
         // redefine the ideal position with a new Z for the bobbing effect
-        idealPos= new Vector(idealPos.x(), idealPos.y(), idealPos.z()+(Math.sin(timeElapsedMax2*2*Math.PI)*0.02));
+        idealPos= new Vector(idealPos.x(), idealPos.y(), idealPos.z()+(Math.sin(timeElapsedMax2*2*Math.PI)*0.005));
         // calculate the direction of the acceleration, this is essentially the vector from the current position to the ideal one
         Vector accelerationDir=idealPos.subtract(pos);
         // calculate the distance between the current position and the ideal one
@@ -94,7 +98,7 @@ public class RobotEye {
         // draw the eye
         gl.glPushMatrix();
         gl.glTranslated(pos.x(), pos.y(), pos.z());
-        glut.glutSolidSphere(0.07f, 10, 10);
+        glut.glutSolidSphere(0.0175f, 10, 10);
         gl.glPopMatrix();
         lastIdealPos=idealPos;
     }
@@ -106,7 +110,7 @@ public class RobotEye {
         gl.glPushMatrix();
         RobotRace.Material.FORCEFIELD.update();
         RobotRace.Material.FORCEFIELD.use(gl);
-        cd.Orb(idealPos, 0.2f, 10);
+        cd.Orb(idealPos, 0.05f, 10);
         r.getMaterial().use(gl);
         gl.glPopMatrix();
     }

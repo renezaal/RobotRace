@@ -88,7 +88,7 @@ public class RobotRace extends Base {
 
         // Initialize robots
         for (int i = 0; i < 4; i++) {
-            robots[i] = new Robot(Material.GOLD, new Vector(0, i * 10, 0), new Vector(0, 1, 0), this);
+            robots[i] = new Robot(Material.GOLD, new Vector(0, i * 10, 0), new Vector(0, 1, 0), this,i);
         }
 
         // Initialize the camera
@@ -242,7 +242,7 @@ public class RobotRace extends Base {
             
         // Draw all four robots
         for (int i = 0; i < robots.length; i++) {
-            robots[i].draw(raceTrack.getPoint(loop), raceTrack.getTangent(loop), false);
+            robots[i].draw(false);
         }
 
         // Draw race track
@@ -469,7 +469,13 @@ public class RobotRace extends Base {
         private RobotEye[] eyes = new RobotEye[2];
         private RobotArm[] arms = new RobotArm[2];
         private Vector heading;
-        private float dGround = 1.2f;
+        private float dGround = 0.3f;
+        private double distance=0;
+        private double speed=1;
+        private RobotRace rr;
+        private double time;
+        private int lane;
+       
 
         /**
          * Constructs the robot with initial parameters.
@@ -479,7 +485,9 @@ public class RobotRace extends Base {
          * @param heading The heading of the robot
          * @param rr The robotrace instance containing this robot
          */
-        public Robot(Material material, Vector pos, Vector heading, RobotRace rr) {
+        public Robot(Material material, Vector pos, Vector heading, RobotRace rr,int lane) {
+            this.rr=rr;
+            this.lane=lane;
             this.material = material;
             this.posX = (float) pos.x();
             this.posY = (float) pos.y();
@@ -494,8 +502,8 @@ public class RobotRace extends Base {
             eyes[0] = new RobotEye(rr, this, cd, eyePos(false));
             eyes[1] = new RobotEye(rr, this, cd, eyePos(true));
 
-            arms[0] = new RobotArm(rr, cd, new Vector(0.30, 0.8, -0.10), false);
-            arms[1] = new RobotArm(rr, cd, new Vector(-0.30, 0.8, -0.10), true);
+            arms[0] = new RobotArm(rr, cd, new Vector(0.075, 0.2, -0.025), false);
+            arms[1] = new RobotArm(rr, cd, new Vector(-0.075, 0.2, -0.025), true);
         }
 
         // returns the material of the robot
@@ -510,9 +518,9 @@ public class RobotRace extends Base {
 
         // calculates the absolute position of an eye
         private Vector eyePos(boolean rightEye) {
-            double relX = rightEye ? 0.18 : -0.18;
-            double relY = 1.14;
-            double relZ = 0.6 ;
+            double relX = rightEye ? 0.045 : -0.045;
+            double relY = 0.285;
+            double relZ = 0.15 ;
             return absolutePosition(relX, relY, relZ);
         }
 
@@ -522,15 +530,15 @@ public class RobotRace extends Base {
         }
 
         private Vector legPos(boolean rightLeg, boolean front) {
-            double relX = rightLeg ? 0.35 : -0.35;
-            double relY = front ? 0.2 : -0.6;
+            double relX = rightLeg ? 0.0875 : -0.0875;
+            double relY = front ? 0.05 : -0.15;
             double relZ = 0;
             return absolutePosition(relX, relY, relZ);
         }
 
         private Vector footPos(boolean rightFoot, boolean front) {
-            double relX = rightFoot ? 1.8 : -1.8;
-            double relY = front ? 0.4 : -0.7;
+            double relX = rightFoot ? 0.45 : -0.45;
+            double relY = front ? 0.1 : -0.175;
             double relZ = -dGround;
             return absolutePosition(relX, relY, relZ);
         }
@@ -538,9 +546,16 @@ public class RobotRace extends Base {
         /**
          * Draws this robot (as a {@code stickfigure} if specified).
          */
-        public void draw(Vector loc, Vector h, boolean stickFigure) {
+        public void draw(boolean stickFigure) {
 
-            double distance = loc.subtract(pos()).length();
+            time=rr.getTime();
+            
+            distance+=time*speed;
+            
+            Vector loc = rr.raceTrack.getPoint(distance);
+            Vector h = rr.raceTrack.getTangent(distance);
+           loc= loc.add(h.cross(Vector.Z).normalized().scale(((double)lane)-1.5));
+            
             posX = (float) loc.x();
             posY = (float) loc.y();
             posZ = (float) loc.z();
@@ -558,8 +573,8 @@ public class RobotRace extends Base {
             gl.glRotated(-90.0, 0, 1, 0);
             //Torso
             gl.glPushMatrix();
-            gl.glTranslatef(0f, 0f, -0.1f);
-            gl.glScalef(0.6f, 1.05f, 0.4f);
+            gl.glTranslatef(0f, 0f, -0.025f);
+            gl.glScalef(0.15f, 0.2625f, 0.1f);
             glut.glutSolidSphere(1f, 20, 10);
             gl.glPopMatrix();
 
@@ -571,21 +586,21 @@ public class RobotRace extends Base {
 
             //Head
             gl.glPushMatrix();
-            gl.glTranslatef(0f, 0.9f, 0.2f);
-            gl.glScalef(0.35f, 0.55f, 0.3f);
+            gl.glTranslatef(0f, 0.225f, 0.05f);
+            gl.glScalef(0.0875f, 0.1375f, 0.075f);
             glut.glutSolidSphere(1f, 20, 10);
             gl.glPopMatrix();
 
             //Left Eye Container
             gl.glPushMatrix();
-            gl.glTranslatef(0.18f, 1.15f, 0.28f);
-            glut.glutSolidCylinder(0.07f, 0.15f, 10, 10);
+            gl.glTranslatef(0.045f, 0.2875f, 0.07f);
+            glut.glutSolidCylinder(0.0175f, 0.0375f, 10, 10);
             gl.glPopMatrix();
             //Right Eye
             //Eye Container
             gl.glPushMatrix();
-            gl.glTranslatef(-0.18f, 1.15f, 0.28f);
-            glut.glutSolidCylinder(0.07f, 0.15f, 10, 10);
+            gl.glTranslatef(-0.045f, 0.2875f, 0.07f);
+            glut.glutSolidCylinder(0.0175f, 0.0375f, 10, 10);
             gl.glPopMatrix();
 
             gl.glPopMatrix();
@@ -1002,6 +1017,7 @@ public class RobotRace extends Base {
            parts/=4.0;
            // decide which part is the one to use by rounding down parts*t
            int part = (int)(parts*t);
+           part*=4.0;
            // calculate the size of a part compared to the whole
            double partSize = 1.0/parts;
            // modulate t to be smaller that a partSize, essentialy discarding all uninteresting parts
@@ -1020,6 +1036,7 @@ public class RobotRace extends Base {
            parts/=4.0;
            // decide which part is the one to use by rounding down parts*t
            int part = (int)(parts*t);
+           part*=4.0;
            // calculate the size of a part compared to the whole
            double partSize = 1.0/parts;
            // modulate t to be smaller that a partSize, essentialy discarding all uninteresting parts

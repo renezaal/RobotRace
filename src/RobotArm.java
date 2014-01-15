@@ -38,8 +38,8 @@ public class RobotArm {
     }
     
     private Vector pos;
-    private double upperArmLength=0.4;
-    private double lowerArmLength=0.6;
+    private double upperArmLength=0.1;
+    private double lowerArmLength=0.15;
     private Vector elbowDir;
     private boolean right;
     
@@ -48,8 +48,8 @@ public class RobotArm {
         
         
         
-        Vector end = new Vector(right?-0.05:0.05, 0.8, -0.1);
+        Vector end = new Vector(right?-0.0125:0.0125, 0.2, -0.025);
         end=end.add(pos);
-        cd.Joint(pos, end, (float)upperArmLength, (float)lowerArmLength, elbowDir, 0.08f, 10);
+        cd.Joint(pos, end, (float)upperArmLength, (float)lowerArmLength, elbowDir, 0.02f, 10);
     }
 }
