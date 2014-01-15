@@ -1017,7 +1017,6 @@ public class RobotRace extends Base {
            parts/=4.0;
            // decide which part is the one to use by rounding down parts*t
            int part = (int)(parts*t);
-           part*=4.0;
            // calculate the size of a part compared to the whole
            double partSize = 1.0/parts;
            // modulate t to be smaller that a partSize, essentialy discarding all uninteresting parts
@@ -1036,7 +1035,6 @@ public class RobotRace extends Base {
            parts/=4.0;
            // decide which part is the one to use by rounding down parts*t
            int part = (int)(parts*t);
-           part*=4.0;
            // calculate the size of a part compared to the whole
            double partSize = 1.0/parts;
            // modulate t to be smaller that a partSize, essentialy discarding all uninteresting parts
