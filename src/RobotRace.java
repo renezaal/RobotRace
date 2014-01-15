@@ -1,6 +1,7 @@
 
 import com.jogamp.opengl.util.gl2.GLUT;
 import com.jogamp.opengl.util.texture.Texture;
+import java.awt.geom.Point2D;
 import java.util.Date;
 import static javax.media.opengl.GL.GL_TRIANGLES;
 import javax.media.opengl.GL2;
@@ -236,19 +237,11 @@ public class RobotRace extends Base {
         gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
         // Draw the axis frame
-        if (gs.showAxes) {
             drawAxisFrame();
-        }
-
-        double x = Math.sin((loop/1.0) % (2.0 * Math.PI)) * 10;
-        double y = Math.cos((loop/1.0) % (2.0 * Math.PI)) * 5;
-
-        Vector roboLoc = new Vector(x, y, 0);
-        Vector heading = roboLoc.cross(Vector.Z);
-//Vector roboPos = (new Vector(x,y,0)).scale(3.0);
+            
         // Draw all four robots
         for (int i = 0; i < robots.length; i++) {
-            robots[i].draw(robots[i].getLocation(), heading, false);
+            robots[i].draw(raceTrack.getPoint(loop), raceTrack.getTangent(loop), false);
         }
 
         // Draw race track
@@ -752,10 +745,17 @@ public class RobotRace extends Base {
      */
         private class RaceTrack {
         int testTrack = -1;
+        double testTrackDistance=0;
         int oTrack = -1;
+        double oTrackDistance=0;
         int lTrack = -1;
+        double lTrackDistance=0;
         int cTrack = -1;
+        double cTrackDistance=0;
         int customTrack = -1;
+        double customTrackDistance=0;
+        double distance=0;
+        int lastTrackNr=-1;
         
         /**
          * Array with control points for the O-track.
@@ -801,7 +801,8 @@ public class RobotRace extends Base {
          * Draws this track, based on the selected track number.
          */
         public void draw(int trackNr) {
-            double distance = 0;
+           distance = 0;
+           lastTrackNr=trackNr;
             double numberOfSteps = 200;
             double step = 1 / numberOfSteps;
             
@@ -869,6 +870,7 @@ public class RobotRace extends Base {
                         }
                         gl.glEnd();
                         gl.glEndList();
+                        testTrackDistance=distance;
                 } else {
                         gl.glCallList(testTrack);
                 }         
@@ -882,6 +884,8 @@ public class RobotRace extends Base {
                     drawCubicBezier(controlPointsOTrack);
                                         
                     gl.glEndList();
+                    
+                    oTrackDistance=distance;
                 } else {
                     gl.glCallList(oTrack);
                 }
@@ -898,6 +902,8 @@ public class RobotRace extends Base {
                     drawCubicBezier(controlPointsLTrack);
                                         
                     gl.glEndList();
+                    
+                    lTrackDistance=distance;
                 } else {
                     gl.glCallList(lTrack);
                 }
@@ -913,6 +919,8 @@ public class RobotRace extends Base {
                     drawCubicBezier(controlPointsCTrack);
                                         
                     gl.glEndList();
+                    
+                    cTrackDistance=distance;
                 } else {
                     gl.glCallList(cTrack);
                 }
@@ -928,6 +936,8 @@ public class RobotRace extends Base {
                     drawCubicBezier(controlPointsCustomTrack);
                                         
                     gl.glEndList();
+                    
+                    customTrackDistance=distance;
                 } else {
                     gl.glCallList(customTrack);
                 }
@@ -939,6 +949,8 @@ public class RobotRace extends Base {
          * Returns the position of the curve at 0 <= {@code t} <= 1.
          */
         public Vector getPoint(double t) {
+            t=t/getDistance();
+            t%=1;
             return new Vector(  10*Math.cos(2*Math.PI*t),
                                 14*Math.sin(2*Math.PI*t),
                                 1);
@@ -948,9 +960,28 @@ public class RobotRace extends Base {
          * Returns the tangent of the curve at 0 <= {@code t} <= 1.
          */
         public Vector getTangent(double t) {
+            t=t/getDistance();
+            t%=1;
             return new Vector(  20*Math.PI*-Math.sin(2*Math.PI*t), 
                                 28*Math.PI*Math.cos(2*Math.PI*t), 
-                                1);
+                                1).normalized();
+        }
+        
+        private double getDistance(){
+            switch(lastTrackNr){
+                case 0:
+                    return testTrackDistance;
+                case 1:
+                    return oTrackDistance;
+                case 2:
+                    return lTrackDistance;
+                case 3:
+                    return cTrackDistance;
+                case 4:
+                    return customTrackDistance;
+                default:
+                    return 1d;
+            }
         }
         
         //http://en.wikipedia.org/wiki/B%C3%A9zier_curve
@@ -974,7 +1005,6 @@ public class RobotRace extends Base {
          }
         
         public void drawCubicBezier(Vector[] controlPoints){
-            double distance = 0;
             double numberOfSteps = 200;
             double step = 1 / numberOfSteps;
             

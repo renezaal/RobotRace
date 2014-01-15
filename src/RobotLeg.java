@@ -42,6 +42,8 @@ public class RobotLeg {
     private double stepStartTime = 0;
     private boolean rightLeg;
     private boolean front;
+    private double upperLegLength = 1.3;
+    private double lowerLegLength = 2.3;
 
     private void pre() {
         gl = rr.getGL();
@@ -71,25 +73,32 @@ public class RobotLeg {
         // we just started moving
         stepStartTime = 0;
     }
-    
+
     private double stepLengthMem;
     private double timeMem;
-    private double stepLength(double time){
-        if (time==timeMem) {
+
+    private double stepLength(double time) {
+        if (time == timeMem) {
             return stepLengthMem;
         }
-            // calculate the total length of this step
-            double stepLength = stepStart.subtract(stepTarget).length();
-            if (stepLength<0.001) {
-                stepLength=0;
-            }
-            
-            return stepLength;
+        // calculate the total length of this step
+        double stepLength = stepStart.subtract(stepTarget).length();
+        if (stepLength < 0.001) {
+            stepLength = 0;
+        }
+
+        return stepLength;
     }
 
     public void Advance(Vector newNeutral, Vector attachment) {
-            // get the time since the last render from the robotrace class
-            double time = rr.getTime();
+        if (Double.isNaN(foot.x()) || Double.isNaN(foot.y()) || Double.isNaN(foot.z())) {
+            foot = newNeutral;
+            onTheGround=true;
+            footProjection=newNeutral;
+            neutral=newNeutral;
+        }
+        // get the time since the last render from the robotrace class
+        double time = rr.getTime();
         // regulate the loop
         if (onTheGround) {
             // keep track of the amount of time this foot has stood still
@@ -100,24 +109,23 @@ public class RobotLeg {
             if (distance > maxDistance) {
                 // if it's farther away than the allowed distance, it has got to move towards the new point.
                 // for that it has to leave the ground
-                
+
                 setStep(newNeutral.add(newNeutral.subtract(new Vector(footProjection.x(), footProjection.y(), 0)).normalized().scale(maxDistance / 2.0)));
             } else {
                 // this is a restless robot
                 if (relaxTimer > maxRelaxTime) {
                     // we'll give a little randomness to the time it takes to relax
                     maxRelaxTime = (Math.random() * 2.0) + 1.0;
-                    
+
                     setStep(newNeutral);
                 }
             }
         } else {
             // if we're moving, we're not relaxing
             relaxTimer = 0;
-            
-            
+
             // if the foot is near the target or too low, we'll assume it's made it to teh target
-            if ((stepLength(time)==0&&stepStartTime>0.5) || (stepLength(time)>0&&stepStart.subtract(footProjection).length() > stepStart.subtract(stepTarget).length())) {
+            if ((stepLength(time) == 0 && stepStartTime > 0.5) || (stepLength(time) > 0 && stepStart.subtract(footProjection).length() > stepStart.subtract(stepTarget).length())) {
                 // and reset it's height to be sure
                 footProjection = new Vector(footProjection.x(), footProjection.y(), newNeutral.z());
                 // so it's on the ground now
@@ -161,7 +169,7 @@ public class RobotLeg {
         // joint start and end points
         cd.Joint(attachment, foot,
                 // length of the first and second limbs
-                1.3f, 2.3f,
+                (float) upperLegLength, (float) lowerLegLength,
                 // direction of the knee
                 Vector.Z,
                 // shapes of the first limb, knee, second limb
