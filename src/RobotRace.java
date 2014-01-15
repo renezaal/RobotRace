@@ -763,16 +763,16 @@ public class RobotRace extends Base {
          */
         private Vector[] controlPointsOTrack = {                                
                                 new Vector(0, -20, 0),   new Vector(30, -20, 0),    new Vector(30, 20, 0),  new Vector(0, 20, 0),
-                                new Vector(0, -20, 0),   new Vector(-30, -20, 0),   new Vector(-30, 20, 0), new Vector(0, 20, 0)
+                                new Vector(0, 20, 0),   new Vector(-30, 20, 0),   new Vector(-30, -20, 0), new Vector(0, -20, 0)
                                 };
         /**
          * Array with control points for the L-track.
          */
         private Vector[] controlPointsLTrack = {                                
                                 new Vector(-20, 40, 0),   new Vector(-20, -20, 0),  new Vector(-20, -20, 0),  new Vector(20, -20, 0),
-                                new Vector(0, 40, 0),     new Vector(0, 0, 0),      new Vector(0, 0, 0),      new Vector(20, 0, 0),
-                                new Vector(20, 0, 0),     new Vector(30, 0, 0),      new Vector(30, -20, 0),      new Vector(20, -20, 0),
-                                new Vector(-20, 40, 0),     new Vector(-20, 50, 0),      new Vector(0, 50, 0),      new Vector(0, 40, 0),
+                                new Vector(20, -20, 0),     new Vector(30, -20, 0),      new Vector(30, 0, 0),      new Vector(20, 0, 0),
+                                new Vector(20, 0, 0),     new Vector(0, 0, 0),      new Vector(0, 0, 0),      new Vector(0, 40, 0),
+                                new Vector(0, 40, 0),     new Vector(0, 50, 0),      new Vector(-20, 50, 0),      new Vector(-20, 40, 0),
                                 };
 
         /**
@@ -782,7 +782,7 @@ public class RobotRace extends Base {
                                 new Vector(10, 10, 0),   new Vector(0, 10, 0),  new Vector(0, -10, 0),  new Vector(10, -10, 0),
                                 new Vector(10, -10, 0),     new Vector(20, -10, 0),      new Vector(20, -30, 0),      new Vector(10, -30, 0),
                                 new Vector(10, -30, 0),     new Vector(-30, -30, 0),      new Vector(-30, 30, 0),      new Vector(10, 30, 0),
-                                new Vector(10, 10, 0),     new Vector(20, 10, 0),      new Vector(20, 30, 0),      new Vector(10, 30, 0)
+                                new Vector(10, 30, 0),     new Vector(20, 30, 0),      new Vector(20, 10, 0),      new Vector(10, 10, 0)
                                 };
 
         /**
@@ -1002,6 +1002,7 @@ public class RobotRace extends Base {
            parts/=4.0;
            // decide which part is the one to use by rounding down parts*t
            int part = (int)(parts*t);
+           part *= 4.0;
            // calculate the size of a part compared to the whole
            double partSize = 1.0/parts;
            // modulate t to be smaller that a partSize, essentialy discarding all uninteresting parts
@@ -1020,6 +1021,7 @@ public class RobotRace extends Base {
            parts/=4.0;
            // decide which part is the one to use by rounding down parts*t
            int part = (int)(parts*t);
+           part *= 4.0;
            // calculate the size of a part compared to the whole
            double partSize = 1.0/parts;
            // modulate t to be smaller that a partSize, essentialy discarding all uninteresting parts
