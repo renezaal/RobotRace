@@ -32,7 +32,7 @@ public class Terrain {
     }
 
     private int displayListIndex = 1;
-    private double size = 50.0;
+    private double size = 75.0;
     private double waterHeight = 0;
     private boolean prepared = false;
     private int OneDColorId;

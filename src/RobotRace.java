@@ -803,7 +803,24 @@ public class RobotRace extends Base {
         /**
          * Array with control points for the custom track.
          */
-        private Vector[] controlPointsCustomTrack;
+        private Vector[] controlPointsCustomTrack = {
+                                new Vector(0, 40, 0),   new Vector(0, 30, 0),  new Vector(0, 30, 0),  new Vector(-10, 30, 0),
+                                new Vector(-10, 30, 0),   new Vector(-20, 30, 0),  new Vector(-20, 30, 0),  new Vector(-20, 10, 0),
+                                new Vector(-20, 10, 0),   new Vector(-20, -10, 0),  new Vector(-20,-10, 0),  new Vector(-50, -10, 0),
+                                new Vector(-50, -10, 0),   new Vector(-60, -10, 0),  new Vector(-60, -40, 0),  new Vector(-50, -40, 0),
+                                new Vector(-50, -40, 0),   new Vector(-30, -40, 0),  new Vector(-30, -40, 0),  new Vector(-30, -30, 0),
+                                new Vector(-30, -30, 0),   new Vector(-30, -20, 0),  new Vector(-30, -20, 0),  new Vector(-20, -20, 0),
+                                new Vector(-20, -20, 0),   new Vector(-10, -20, 0),  new Vector(-10, -20, 0),  new Vector(-10, -60, 0),
+                                new Vector(-10, -60, 0),   new Vector(-10, -70, 0),  new Vector(10, -70, 0),  new Vector(10, -60, 0),
+                                new Vector(10, -60, 0),   new Vector(10, -40, 0),  new Vector(10, -40, 0),  new Vector(20, -40, 0),
+                                new Vector(20, -40, 0),   new Vector(30, -40, 0),  new Vector(30, -40, 0),  new Vector(30, 0, 0),
+                                new Vector(30, 0, 0),   new Vector(30, 10, 0),  new Vector(10, 10, 0),  new Vector(10, 0, 0),
+                                new Vector(10, 0, 0),   new Vector(10, -20, 0),  new Vector(10, -20, 0),  new Vector(0, -20, 0),
+                                new Vector(0, -20, 0),   new Vector(-10, -20, 0),  new Vector(-10, 20, 0),  new Vector(0, 20, 0),
+                                new Vector(0, 20, 0),   new Vector(20, 20, 0),  new Vector(20, 20, 0),  new Vector(20, 30, 0),
+                                new Vector(20, 30, 0),   new Vector(20, 50, 0),  new Vector(20, 50, 0),  new Vector(10, 50, 0),
+                                new Vector(10, 50, 0),   new Vector(0, 50, 0),  new Vector(0, 50, 0),  new Vector(0, 40, 0),
+        };
 
         /**
          * Constructs the race track, sets up display lists.
