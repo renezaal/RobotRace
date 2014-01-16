@@ -19,6 +19,7 @@ public class Terrain {
 
     public Terrain(RobotRace rr) {
         this.rr = rr;
+        perlin=new PerlinNoise(897964513, 4, 6.0);
     }
     RobotRace rr;
     private GL2 gl;
@@ -37,6 +38,7 @@ public class Terrain {
     private boolean prepared = false;
     private int OneDColorId;
     private double gridSize = 0.5;
+    private PerlinNoise perlin;
 
     private void color(double height) {
         if (height > 1.5) {
@@ -162,7 +164,7 @@ public class Terrain {
     }
 
     public double heightAt(double x, double y) {
-        double h = (0.6 * Math.cos(0.5 * x + 0.2 * y) + 0.4 * Math.cos(x - 0.8 * y)) * 1.5;
+        double h = perlin.noise2d(x, y)*5.0;
         return minMaxHeightCorrection(h, x, y);
     }
 

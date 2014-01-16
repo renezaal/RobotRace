@@ -464,7 +464,7 @@ public class RobotRace extends Base {
             return new Vector(posX, posY, posZ);
         }
 
-        private Vector heading() {
+        public Vector heading() {
             return heading.normalized();
         }
 
@@ -662,13 +662,45 @@ public class RobotRace extends Base {
          */
         public Vector up = Vector.Z;
 
+        /*
+         variables used for switching modes
+         */
+        private double toNextMode = 1;
+        private int lastMode = 0;
+        private int nextMode = 0;
+
         /**
          * Updates the camera viewpoint and direction based on the selected
          * camera mode.
          */
         public void update(int mode) {
-            robots[0].toString();
 
+            // Helicopter mode
+            if (1 == mode) {
+                setHelicopterMode();
+
+                // Motor cycle mode
+            } else if (2 == mode) {
+                setMotorCycleMode();
+
+                // First person mode
+            } else if (3 == mode) {
+                setFirstPersonMode();
+
+                // Auto mode
+            } else if (4 == mode) {
+                // code goes here...
+
+                // Default mode
+            } else {
+
+                glu.gluLookAt(
+                        gs.vDist * Math.cos(gs.phi) * Math.sin(gs.theta) + gs.cnt.x() // X-camera
+                        , gs.vDist * Math.cos(gs.phi) * Math.cos(gs.theta) + gs.cnt.y() // Y-camera
+                        , gs.vDist * Math.sin(gs.phi) + gs.cnt.z(), // Z-camera
+                        gs.cnt.x(), gs.cnt.y(), gs.cnt.z(),
+                        0, 0, 1);
+            }
             // draw a light above and to the left of the camera
             // calculate the direction in which the camera looks in the xy plane 
             Vector xyCameraDir = (new Vector(eye.subtract(center).x(), eye.subtract(center).y(), 0)).normalized();
@@ -698,34 +730,9 @@ public class RobotRace extends Base {
 
             // activate the spot
             gl.glLightfv(GL_LIGHT1, GL_POSITION, light1co, 0);
-
-            // Helicopter mode
-            if (1 == mode) {
-                setHelicopterMode();
-
-                // Motor cycle mode
-            } else if (2 == mode) {
-                setMotorCycleMode();
-
-                // First person mode
-            } else if (3 == mode) {
-                setFirstPersonMode();
-
-                // Auto mode
-            } else if (4 == mode) {
-                // code goes here...
-
-                // Default mode
-            } else {
-                setDefaultMode();
+            if (mode != 0) {
+                glu.gluLookAt(eye.x(), eye.y(), eye.z(), center.x(), center.y(), center.z(), up.x(), up.y(), up.z());
             }
-
-            glu.gluLookAt(
-                    gs.vDist * Math.cos(gs.phi) * Math.sin(gs.theta) + gs.cnt.x() // X-camera
-                    , gs.vDist * Math.cos(gs.phi) * Math.cos(gs.theta) + gs.cnt.y() // Y-camera
-                    , gs.vDist * Math.sin(gs.phi) + gs.cnt.z(), // Z-camera
-                    gs.cnt.x(), gs.cnt.y(), gs.cnt.z(),
-                    0, 0, 1);
         }
 
         /**
@@ -741,7 +748,8 @@ public class RobotRace extends Base {
          * helicopter mode.
          */
         private void setHelicopterMode() {
-            // code goes here ...
+            eye = raceTrack.getPoint(loop - 12).add(up.scale(Math.sin(loop) + 10));
+            center = robots[0].pos();
         }
 
         /**
@@ -749,15 +757,19 @@ public class RobotRace extends Base {
          * motorcycle mode.
          */
         private void setMotorCycleMode() {
-            // code goes here ...
+            Robot robot = robots[0];
+            Vector pos=robot.pos();
+            Vector h=robot.heading();
+            eye=pos.add(h.cross(Vector.Z).normalized().scale(- 2.0)).add(Vector.Z.scale(Math.sin(loop/20)*0.2+0.4));
+            center=pos;
         }
 
         /**
          * Computes {@code eye}, {@code center}, and {@code up}, based on the
          * first person mode.
          */
+        
         private void setFirstPersonMode() {
-            // code goes here ...
         }
 
     }
