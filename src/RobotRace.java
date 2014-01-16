@@ -55,6 +55,10 @@ public class RobotRace extends Base {
     public GLUT getGLUT() {
         return glut;
     }
+    
+    public RaceTrack getTrack(){
+        return raceTrack;
+    }
     /**
      * Array of the four robots.
      */
@@ -766,7 +770,7 @@ public class RobotRace extends Base {
     /**
      * Implementation of a race track that is made from Bezier segments.
      */
-        private class RaceTrack {
+        public class RaceTrack {
         int testTrack = -1;
         double testTrackDistance=0;
         int oTrack = -1;
@@ -779,6 +783,7 @@ public class RobotRace extends Base {
         double customTrackDistance=0;
         double distance=0;
         int lastTrackNr=0;
+        boolean redraw=false;
         
         /**
          * Array with control points for the O-track.
@@ -841,7 +846,9 @@ public class RobotRace extends Base {
          * Draws this track, based on the selected track number.
          */
         public void draw(int trackNr) {
-           
+            if (trackNr!=lastTrackNr) {
+                redraw=true;
+            }
             lastTrackNr=trackNr;
             double numberOfSteps = 200;
             double step = 1 / numberOfSteps;
@@ -988,6 +995,7 @@ public class RobotRace extends Base {
                 }
 
             }
+            terrain.ReDraw();
         }
 
         // Return the point of the curve at a specified t
@@ -997,10 +1005,13 @@ public class RobotRace extends Base {
                                 14*Math.sin(2*Math.PI*t),
                                 0);
         }
-        
         public Vector getPoint(double t) {
             t=t/getDistance();
             t%=1;
+            return getPointSub(t);
+        }
+        private Vector getPointSub(double t){
+            
             if (lastTrackNr==0) {
                 
             return new Vector(  10*Math.cos(2*Math.PI*t),
@@ -1061,6 +1072,10 @@ public class RobotRace extends Base {
         public Vector getTangent(double t) {
             t=t/getDistance();
             t%=1;
+           return getTangentSub(t);
+        }
+        private Vector getTangentSub(double t){
+            
             if (lastTrackNr==0) {
                 
             return new Vector(  20*Math.PI*-Math.sin(2*Math.PI*t), 
@@ -1068,6 +1083,46 @@ public class RobotRace extends Base {
                                 1).normalized();
             } else    {
                 return getTangentOnBezierTrack(t, getTrack());
+            }
+        }
+        
+        // gets the point closest by the given point
+        public Vector getClosestPoint(Vector v){
+            return getClosestPointSub(v, 0, 1);
+        }
+        
+        // subroutine of getClosestPoint(Vector v)
+        private Vector getClosestPointSub(Vector v,double begin,double end){
+            if (end-begin<0.01) {
+                return getPointSub((end+begin)/2);
+            }
+            double low=Double.MAX_VALUE;
+            double lowPoint=begin;
+            double high=Double.MAX_VALUE;
+            double highPoint=end;
+            double partSize=(end-begin)/20.0;
+            for (double i = begin; i < end; i+=partSize) {
+                double d = getPointSub(i).subtract(v).length();
+                if (d<high) {
+                    low=high;
+                    lowPoint=highPoint;
+                    high=d;
+                    highPoint=i;
+                }else if(d<low){
+                    low=d;
+                    lowPoint=i;
+                }
+            }
+            if (lowPoint==highPoint) {
+                return getPointSub(highPoint);
+            }
+            if (lowPoint==begin&&highPoint==end) {
+                return getPointSub((end+begin)/2);
+            }
+            if (lowPoint<highPoint) {
+                return getClosestPointSub(v, lowPoint, highPoint);
+            }else{
+                return getClosestPointSub(v, highPoint, lowPoint);
             }
         }
         

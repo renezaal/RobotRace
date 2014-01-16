@@ -31,7 +31,7 @@ public class Terrain {
         glut = rr.getGLUT();
     }
 
-    private int displayListIndex = 1;
+    private int displayListIndex = -1;
     private double size = 75.0;
     private double waterHeight = 0;
     private boolean prepared = false;
@@ -50,6 +50,19 @@ public class Terrain {
 
     }
 
+    private double minMaxHeightCorrection(double h, double x, double y) {
+        RobotRace.RaceTrack rt = rr.getTrack();
+        double trackDist = rt.getClosestPoint(new Vector(x, y, 0)).subtract(new Vector(x, y, 0)).length();
+        double maxHeight = trackDist / 4;
+        double minHeight = -trackDist / 4;
+        if (h > maxHeight) {
+            return maxHeight;
+        } else if (h < minHeight) {
+            return minHeight;
+        }
+        return h;
+    }
+
     private void prepare() {
         pre();
 
@@ -61,7 +74,12 @@ public class Terrain {
         colors[4] = new Color(70, 79, 68);
         OneDColorId = OneDTextureInit.create1DTexture(gl, colors);
 
-        displayListIndex = gl.glGenLists(1);
+        if (displayListIndex < 0) {
+            displayListIndex = gl.glGenLists(1);
+        }
+        if (gl.glIsList(displayListIndex)) {
+            gl.glDeleteLists(displayListIndex, 1);
+        }
         gl.glNewList(displayListIndex, GL_COMPILE);
         RobotRace.Material.NONE.use(gl);
         gl.glEnable(GL_TEXTURE_1D);
@@ -77,47 +95,46 @@ public class Terrain {
                 Vector v2 = new Vector(gridSize, 0, lrH - llH);
                 Vector v3 = new Vector(0, gridSize, ulH - llH);
                 Vector n1 = normal(v1, v2);
-                Vector n2 = normal(v1,v3);
-                
+                Vector n2 = normal(v1, v3);
+
                 gl.glBindTexture(GL_TEXTURE_1D, OneDColorId);
                 gl.glBegin(GL_TRIANGLES);
 
                 gl.glNormal3d(n1.x(), n1.y(), n1.z());
-                
+
                 color(llH);
                 gl.glVertex3d(x, y, llH);
-                
+
                 color(lrH);
-                gl.glVertex3d(x+gridSize, y, lrH);
-                
+                gl.glVertex3d(x + gridSize, y, lrH);
+
                 color(urH);
-                gl.glVertex3d(x+gridSize, y+gridSize, urH);
-                
+                gl.glVertex3d(x + gridSize, y + gridSize, urH);
+
                 gl.glEnd();
-                
-                
+
                 gl.glBindTexture(GL_TEXTURE_1D, OneDColorId);
                 gl.glBegin(GL_TRIANGLES);
-                
+
                 gl.glNormal3d(n2.x(), n2.y(), n2.z());
-                
+
                 color(llH);
                 gl.glVertex3d(x, y, llH);
-                
+
                 color(ulH);
-                gl.glVertex3d(x, y+gridSize, ulH);
-                
+                gl.glVertex3d(x, y + gridSize, ulH);
+
                 color(urH);
-                gl.glVertex3d(x+gridSize, y+gridSize, urH);
-                
+                gl.glVertex3d(x + gridSize, y + gridSize, urH);
+
                 gl.glEnd();
 
             }
 
         }
-        
+
         gl.glDisable(GL_TEXTURE_1D);
-        
+
         gl.glBegin(GL_QUADS);
         RobotRace.Material.WATER.use(gl);
         gl.glVertex3d(-size, -size, 0);
@@ -125,10 +142,14 @@ public class Terrain {
         gl.glVertex3d(size, size, 0);
         gl.glVertex3d(-size, size, 0);
         gl.glEnd();
-        
+
         gl.glEndList();
 
         prepared = true;
+    }
+    
+    public void ReDraw(){
+        prepare();
     }
 
     public void Draw() {
@@ -141,7 +162,8 @@ public class Terrain {
     }
 
     public double heightAt(double x, double y) {
-        return (0.6 * Math.cos(0.5 * x + 0.2 * y) + 0.4 * Math.cos(x - 0.8 * y));
+        double h = (0.6 * Math.cos(0.5 * x + 0.2 * y) + 0.4 * Math.cos(x - 0.8 * y)) * 1.5;
+        return minMaxHeightCorrection(h, x, y);
     }
 
     private Vector normal(Vector v1, Vector v2) {
