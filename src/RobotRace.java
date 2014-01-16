@@ -1,3 +1,4 @@
+
 import com.jogamp.opengl.util.gl2.GLUT;
 import com.jogamp.opengl.util.texture.Texture;
 import java.util.ArrayList;
@@ -264,9 +265,28 @@ public class RobotRace extends Base {
         // Draw the axis frame
         drawAxisFrame();
 
+        // determine if there is a winner yet
+        boolean winner=false;
+        for(Robot r:robots){
+            if (r.distance>raceTrack.getDistance()) {
+                winner=true;
+            }
+        }
+        if (winner) {
+            for(Robot r:robots){
+               int i= getRacePos(r);
+                if (i==1) {
+                    r.raceOver(true);
+                }else{
+                    r.raceOver(false);
+                }
+            }
+        }
         // Draw all four robots
         for (int i = 0; i < robots.length; i++) {
-            robots[i].draw(false);
+            Robot r = robots[i];
+
+            r.draw(false);
         }
 
         // Draw race track
@@ -499,6 +519,15 @@ public class RobotRace extends Base {
          */
         private final Material material;
 
+        public void raceOver(boolean win) {
+            if (!raceOver) {
+                won = win;
+                raceOver = true;
+            }
+        }
+        private boolean won = false;
+        private boolean raceOver = false;
+
         private Vector pos() {
             return new Vector(posX, posY, posZ);
         }
@@ -537,8 +566,11 @@ public class RobotRace extends Base {
         private boolean boosting = false;
 
         private void newPos() {
-            double position = (double) rr.getRacePos(this);
             time = rr.getTime();
+            if (raceOver) {
+                return;
+            }
+            double position = (double) rr.getRacePos(this);
             if (boosting) {
                 boost -= time;
                 if (boost < 0) {
@@ -554,8 +586,8 @@ public class RobotRace extends Base {
             Vector loc = rr.raceTrack.getPoint(distance);
             Vector h = rr.raceTrack.getTangent(distance);
 
-            double acceleration = (position * 0.1) + Math.random()*0.1;
-            acceleration -= Math.random()*0.1;
+            double acceleration = (position * 0.1) + Math.random() * 0.1;
+            acceleration -= Math.random() * 0.1;
             acceleration *= time * time;
             speed += acceleration;
             if (speed > 1.5) {
@@ -564,7 +596,7 @@ public class RobotRace extends Base {
             if (speed < 0.5) {
                 speed = 0.5;
             }
-            speed+=boosting ? 1 : 0;
+            speed += boosting ? 1 : 0;
             distance += time * speed;
             loc = raceTrack.getPoint(distance);
             loc = loc.add(h.cross(Vector.Z).normalized().scale(((double) lane) - 1.5));
@@ -654,7 +686,10 @@ public class RobotRace extends Base {
          * Draws this robot (as a {@code stickfigure} if specified).
          */
         public void draw(boolean stickFigure) {
-newPos();
+            if (won) {
+                dGround = (float) (0.5f + Math.sin(rr.getLoop()) * 0.3);
+            }
+            newPos();
             gl.glPushMatrix();
 
             // set the material properties
@@ -880,15 +915,15 @@ newPos();
         boolean redraw = false;
 
         /**
-* Array with control points for the O-track.
-*/
+         * Array with control points for the O-track.
+         */
         private Vector[] controlPointsOTrack = {
             new Vector(0, -20, 0), new Vector(30, -20, 0), new Vector(30, 20, 0), new Vector(0, 20, 0),
             new Vector(0, 20, 0), new Vector(-30, 20, 0), new Vector(-30, -20, 0), new Vector(0, -20, 0)
         };
         /**
-* Array with control points for the L-track.
-*/
+         * Array with control points for the L-track.
+         */
         private Vector[] controlPointsLTrack = {
             new Vector(-20, 40, 0), new Vector(-20, -20, 0), new Vector(-20, -20, 0), new Vector(20, -20, 0),
             new Vector(20, -20, 0), new Vector(30, -20, 0), new Vector(30, 0, 0), new Vector(20, 0, 0),
@@ -896,8 +931,8 @@ newPos();
             new Vector(0, 40, 0), new Vector(0, 50, 0), new Vector(-20, 50, 0), new Vector(-20, 40, 0),};
 
         /**
-* Array with control points for the C-track.
-*/
+         * Array with control points for the C-track.
+         */
         private Vector[] controlPointsCTrack = {
             new Vector(10, 10, 0), new Vector(0, 10, 0), new Vector(0, -10, 0), new Vector(10, -10, 0),
             new Vector(10, -10, 0), new Vector(20, -10, 0), new Vector(20, -30, 0), new Vector(10, -30, 0),
@@ -906,8 +941,8 @@ newPos();
         };
 
         /**
-* Array with control points for the custom track.
-*/
+         * Array with control points for the custom track.
+         */
         private Vector[] controlPointsCustomTrack = {
             new Vector(0, 40, 0), new Vector(0, 30, 0), new Vector(0, 30, 0), new Vector(-10, 30, 0),
             new Vector(-10, 30, 0), new Vector(-20, 30, 2), new Vector(-20, 30, 2), new Vector(-20, 10, 4),
@@ -927,25 +962,25 @@ newPos();
             new Vector(10, 50, 0), new Vector(0, 50, 0), new Vector(0, 50, 0), new Vector(0, 40, 0),};
 
         /**
-* Constructs the race track, sets up display lists.
-*/
+         * Constructs the race track, sets up display lists.
+         */
         public RaceTrack() {
 
         }
 
         /**
-* Draws this track, based on the selected track number.
-*/
+         * Draws this track, based on the selected track number.
+         */
         public void draw(int trackNr) {
             redraw = trackNr != lastTrackNr;
             lastTrackNr = trackNr;
-            double size=15;
+            double size = 15;
             double numberOfSteps = 200;
             double step = 1 / numberOfSteps;
 
             // The test track is selected
             if (0 == trackNr) {
-                size=20;
+                size = 20;
                 // Checks if display list is allready created
                 if (testTrack == -1) {
                     // Resets the distance
@@ -1016,7 +1051,7 @@ newPos();
                     gl.glCallList(testTrack);
                 }
             } else if (1 == trackNr) {
-                size=30;
+                size = 30;
                 // Checks if display list is allready created
                 if (oTrack == -1) {
                     // Creates a display list for the O track
@@ -1035,7 +1070,7 @@ newPos();
 
                 // The L-track is selected
             } else if (2 == trackNr) {
-                size=55;
+                size = 55;
                 // Checks if display list is allready created
                 if (lTrack == -1) {
                     // Creates a display list for the L track
@@ -1054,7 +1089,7 @@ newPos();
 
                 // The C-track is selected
             } else if (3 == trackNr) {
-                size=40;
+                size = 40;
                 // Checks if display list is allready created
                 if (cTrack == -1) {
                     // Creates a display list for the C track
@@ -1073,7 +1108,7 @@ newPos();
 
                 // The custom track is selected
             } else if (4 == trackNr) {
-                size=75;
+                size = 75;
                 // Checks if display list is allready created
                 if (customTrack == -1) {
                     // Creates a display list for the custom track
@@ -1086,7 +1121,7 @@ newPos();
                     // Sets the distance for the custom track
                     customTrackDistance = distance;
                 } else {
-                    
+
                     // Calls the display list
                     gl.glCallList(customTrack);
                 }
@@ -1096,15 +1131,15 @@ newPos();
                 terrain.ReDraw(size);
             }
         }
-        
-        private void drawPillars(int amount){
-            double partSize = 1.0/((double)amount);
+
+        private void drawPillars(int amount) {
+            double partSize = 1.0 / ((double) amount);
             for (int i = 0; i < amount; i++) {
-               Vector currentPoint= getPointSub(((double)i)*partSize);
-               float x= (float)currentPoint.x();
-               float y=(float)currentPoint.y();
-               float upperZ=(float)currentPoint.z()-0.3f;
-               float lowerZ= -10f;
+                Vector currentPoint = getPointSub(((double) i) * partSize);
+                float x = (float) currentPoint.x();
+                float y = (float) currentPoint.y();
+                float upperZ = (float) currentPoint.z() - 0.3f;
+                float lowerZ = -10f;
                 cd.Rectangle(x, y, upperZ, x, y, lowerZ, 0.8f);
             }
         }
@@ -1443,8 +1478,6 @@ newPos();
         }
 
     }
-
-
 
     /**
      * Main program execution body, delegates to an instance of the RobotRace
