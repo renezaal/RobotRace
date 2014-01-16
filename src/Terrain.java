@@ -141,7 +141,7 @@ public class Terrain {
     }
 
     public double heightAt(double x, double y) {
-        return (0.6 * Math.cos(0.3 * x + 0.2 * y) + 0.4 * Math.cos(x - 0.5 * y));
+        return (0.6 * Math.cos(0.5 * x + 0.2 * y) + 0.4 * Math.cos(x - 0.8 * y));
     }
 
     private Vector normal(Vector v1, Vector v2) {
