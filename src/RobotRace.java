@@ -55,22 +55,25 @@ public class RobotRace extends Base {
     public GLUT getGLUT() {
         return glut;
     }
-    
-    public RaceTrack getTrack(){
+
+    public RaceTrack getTrack() {
         return raceTrack;
     }
     /**
      * Array of the four robots.
      */
     private final Robot[] robots;
+
     /**
      * Instance of the camera.
      */
     private final Camera camera;
+
     /**
      * Instance of the race track.
      */
     private final RaceTrack raceTrack;
+
     /**
      * Instance of the terrain.
      */
@@ -99,7 +102,7 @@ public class RobotRace extends Base {
         // Initialize the terrain
         terrain = new Terrain(this);
 
-        Tree t = new Tree(this, cd, terrain, 0, 0);
+        Tree t = new Tree(this, cd, 0, 0);
         trees.add(t);
     }
     private ArrayList<Tree> trees = new ArrayList<Tree>();
@@ -181,10 +184,13 @@ public class RobotRace extends Base {
         // Update the view according to the camera mode
         camera.update(gs.camMode);
     }
+
     // variable for storing the last time a draw was called
     private Date time = new Date();
+
     // variable for storing the time between draws
     private double timePassed = 1;
+
 // variable for keeping track of loops, is reset at 600 seconds/10 minutes
     private double loop = 0;
 
@@ -310,94 +316,93 @@ public class RobotRace extends Base {
          * Gold material properties.
          */
         GOLD(
-        new float[]{0.75164f, 0.60648f, 0.22648f, 1f},
-        new float[]{0.628281f, 0.555802f, 0.366065f, 1f},
-        new float[]{51.2f}),
+                new float[]{0.75164f, 0.60648f, 0.22648f, 1f},
+                new float[]{0.628281f, 0.555802f, 0.366065f, 1f},
+                new float[]{51.2f}),
         /**
          * Silver material properties.
          */
         SILVER(
-        new float[]{0.50754f, 0.50754f, 0.50754f, 1f},
-        new float[]{0.508273f, 0.508273f, 0.508273f, 1f},
-        new float[]{51.2f}),
+                new float[]{0.50754f, 0.50754f, 0.50754f, 1f},
+                new float[]{0.508273f, 0.508273f, 0.508273f, 1f},
+                new float[]{51.2f}),
         /**
          * Wood material properties.
          */
         WOOD(
-        new float[]{0.227f, 0.13f, 0.065f, 1.0f},
-        new float[]{0.3f, 0.14f, 0.071f, 1.0f},
-        new float[]{2f}),
+                new float[]{0.227f, 0.13f, 0.065f, 1.0f},
+                new float[]{0.3f, 0.14f, 0.071f, 1.0f},
+                new float[]{2f}),
         /*
          Transparent blue flickering color to emulate some sort of forcefield
          */
         FORCEFIELD(
-        forceFieldColor(),
-        forceFieldColor(),
-        new float[]{0f}),
+                forceFieldColor(),
+                forceFieldColor(),
+                new float[]{0f}
+        ),
         /*
          Water color
          */
         WATER(
-        new float[]{0.50754f, 0.50754f, 0.50754f, 0.5f},
-        new float[]{0.508273f, 0.508273f, 0.508273f, 0.3f},
-        new float[]{80f}),
+                new float[]{0.50754f, 0.50754f, 0.50754f, 0.5f},
+                new float[]{0.508273f, 0.508273f, 0.508273f, 0.3f},
+                new float[]{80f}
+        ),
         /*
          Nice clear material for non-interference with textures
          */
         NONE(
-        new float[]{1f, 1f, 1f, 1f},
-        new float[]{1f, 1f, 1f, 1f},
-        new float[]{10f}),
+                new float[]{1f, 1f, 1f, 1f},
+                new float[]{1f, 1f, 1f, 1f},
+                new float[]{10f}
+        ),
         /**
          * Orange material properties.
          */
         ORANGE(
-        new float[]{1f, 0.5f, 0f, 1.0f},
-        new float[]{1f, 0.5f, 0f, 1.0f},
-        new float[]{20f}),
+                new float[]{1f, 0.5f, 0f, 1.0f},
+                new float[]{1f, 0.5f, 0f, 1.0f},
+                new float[]{20f}),
         /**
          * Yellow material properties.
          */
         YELLOW(
-        new float[]{1f, 1f, 0f, 1.0f},
-        new float[]{1f, 1f, 0f, 1.0f},
-        new float[]{20f}),
+                new float[]{1f, 1f, 0f, 1.0f},
+                new float[]{1f, 1f, 0f, 1.0f},
+                new float[]{20f}),
         /**
          * Blue material properties.
          */
         BLUE(
-        new float[]{0f, 0f, 1f, 1.0f},
-        new float[]{0f, 0f, 1f, 1.0f},
-        new float[]{20f}),
+                new float[]{0f, 0f, 1f, 1.0f},
+                new float[]{0f, 0f, 1f, 1.0f},
+                new float[]{20f}),
         /**
          * Green material properties.
          */
         GREEN(
-        new float[]{0f, 1f, 0f, 1.0f},
-        new float[]{0f, 1f, 0f, 1.0f},
-        new float[]{20f}),
-        /**
-         * Leaves material properties.
-         */
-        LEAVES(
-        new float[]{0.435f, 0.69f, 0.333f, 1.0f},
-        new float[]{0.16f, 0.4f, 0.07f, 1.0f},
-        new float[]{20f}),
+                new float[]{0f, 1f, 0f, 1.0f},
+                new float[]{0f, 1f, 0f, 1.0f},
+                new float[]{20f}),
         /* 
          *Red material properties
          */
         RED(
-        new float[]{1f, 0f, 0f, 1.0f},
-        new float[]{1f, 0f, 0f, 1.0f},
-        new float[]{20f});
+                new float[]{1f, 0f, 0f, 1.0f},
+                new float[]{1f, 0f, 0f, 1.0f},
+                new float[]{20f});
+
         /**
          * The diffuse RGBA reflectance of the material.
          */
         float[] diffuse;
+
         /**
          * The specular RGBA reflectance of the material.
          */
         float[] specular;
+
         // The shininess of the material in RGBA
         float[] shinyness;
 
@@ -571,7 +576,6 @@ public class RobotRace extends Base {
             // set the material properties
             material.use(gl);
 
-
             gl.glTranslatef(posX, posY, posZ + dGround);
             cd.Transform(heading);
             gl.glRotated(90.0, 1, 0, 0);
@@ -582,7 +586,6 @@ public class RobotRace extends Base {
             gl.glScalef(0.15f, 0.2625f, 0.1f);
             glut.glutSolidSphere(1f, 20, 10);
             gl.glPopMatrix();
-
 
             //Arms
             for (RobotArm arm : arms) {
@@ -615,7 +618,6 @@ public class RobotRace extends Base {
                 leg.Advance(footPos(leg.isRight(), leg.isFront()), legPos(leg.isRight(), leg.isFront()));
             }
 
-
             //Left Eye
             gl.glPushMatrix();
             eyes[0].Draw(eyePos(false));
@@ -636,8 +638,8 @@ public class RobotRace extends Base {
             eyes[1].drawForceField(eyePos(true));
             gl.glPopMatrix();
 
-
         }
+
     }
 
     /**
@@ -649,10 +651,12 @@ public class RobotRace extends Base {
          * The position of the camera.
          */
         public Vector eye = new Vector(3f, 6f, 5f);
+
         /**
          * The point to which the camera is looking.
          */
         public Vector center = Vector.O;
+
         /**
          * The up vector.
          */
@@ -710,6 +714,7 @@ public class RobotRace extends Base {
                 // Auto mode
             } else if (4 == mode) {
                 // code goes here...
+
                 // Default mode
             } else {
                 setDefaultMode();
@@ -754,12 +759,14 @@ public class RobotRace extends Base {
         private void setFirstPersonMode() {
             // code goes here ...
         }
+
     }
 
     /**
      * Implementation of a race track that is made from Bezier segments.
      */
-        public class RaceTrack {
+    public class RaceTrack {
+
         int testTrack = -1;
         double testTrackDistance = 0;
         int oTrack = -1;
@@ -769,11 +776,11 @@ public class RobotRace extends Base {
         int cTrack = -1;
         double cTrackDistance = 0;
         int customTrack = -1;
-        double customTrackDistance=0;
-        double distance=0;
-        int lastTrackNr=0;
-        boolean redraw=false;
-        
+        double customTrackDistance = 0;
+        double distance = 0;
+        int lastTrackNr = 0;
+        boolean redraw = false;
+
         /**
          * Array with control points for the O-track.
          */
@@ -789,6 +796,7 @@ public class RobotRace extends Base {
             new Vector(20, -20, 0), new Vector(30, -20, 0), new Vector(30, 0, 0), new Vector(20, 0, 0),
             new Vector(20, 0, 0), new Vector(0, 0, 0), new Vector(0, 0, 0), new Vector(0, 40, 0),
             new Vector(0, 40, 0), new Vector(0, 50, 0), new Vector(-20, 50, 0), new Vector(-20, 40, 0),};
+
         /**
          * Array with control points for the C-track.
          */
@@ -798,6 +806,7 @@ public class RobotRace extends Base {
             new Vector(10, -30, 0), new Vector(-30, -30, 0), new Vector(-30, 30, 0), new Vector(10, 30, 0),
             new Vector(10, 30, 0), new Vector(20, 30, 0), new Vector(20, 10, 0), new Vector(10, 10, 0)
         };
+
         /**
          * Array with control points for the custom track.
          */
@@ -823,16 +832,17 @@ public class RobotRace extends Base {
          * Constructs the race track, sets up display lists.
          */
         public RaceTrack() {
+
         }
 
         /**
          * Draws this track, based on the selected track number.
          */
         public void draw(int trackNr) {
-            if (trackNr!=lastTrackNr) {
-                redraw=true;
+            if (trackNr != lastTrackNr) {
+                redraw = true;
             }
-            lastTrackNr=trackNr;
+            lastTrackNr = trackNr;
             double numberOfSteps = 200;
             double step = 1 / numberOfSteps;
 
@@ -922,7 +932,6 @@ public class RobotRace extends Base {
                     gl.glCallList(oTrack);
                 }
 
-
                 // The L-track is selected
             } else if (2 == trackNr) {
                 // Checks if display list is allready created
@@ -978,7 +987,9 @@ public class RobotRace extends Base {
                 }
 
             }
-            terrain.ReDraw();
+            if (redraw) {
+                terrain.ReDraw();
+            }
         }
 
         // Return the point of the curve at a specified t
@@ -988,18 +999,20 @@ public class RobotRace extends Base {
                     14 * Math.sin(2 * Math.PI * t),
                     0);
         }
+
         public Vector getPoint(double t) {
-            t=t/getDistance();
-            t%=1;
+            t = t / getDistance();
+            t %= 1;
             return getPointSub(t);
         }
-        private Vector getPointSub(double t){
-            
-            if (lastTrackNr==0) {
-                
-            return new Vector(  10*Math.cos(2*Math.PI*t),
-                                14*Math.sin(2*Math.PI*t),
-                                1);
+
+        private Vector getPointSub(double t) {
+
+            if (lastTrackNr == 0) {
+
+                return new Vector(10 * Math.cos(2 * Math.PI * t),
+                        14 * Math.sin(2 * Math.PI * t),
+                        1);
             } else {
                 return getPointOnBezierTrack(t, getTrack());
             }
@@ -1052,64 +1065,65 @@ public class RobotRace extends Base {
         }
 
         public Vector getTangent(double t) {
-            t=t/getDistance();
-            t%=1;
-           return getTangentSub(t);
+            t = t / getDistance();
+            t %= 1;
+            return getTangentSub(t);
         }
-        private Vector getTangentSub(double t){
-            
-            if (lastTrackNr==0) {
-                
-            return new Vector(  20*Math.PI*-Math.sin(2*Math.PI*t), 
-                                28*Math.PI*Math.cos(2*Math.PI*t), 
-                                1).normalized();
-            } else    {
+
+        private Vector getTangentSub(double t) {
+
+            if (lastTrackNr == 0) {
+
+                return new Vector(20 * Math.PI * -Math.sin(2 * Math.PI * t),
+                        28 * Math.PI * Math.cos(2 * Math.PI * t),
+                        1).normalized();
+            } else {
                 return getTangentOnBezierTrack(t, getTrack());
             }
         }
-        
+
         // gets the point closest by the given point
-        public Vector getClosestPoint(Vector v){
+        public Vector getClosestPoint(Vector v) {
             return getClosestPointSub(v, 0, 1);
         }
-        
+
         // subroutine of getClosestPoint(Vector v)
-        private Vector getClosestPointSub(Vector v,double begin,double end){
-            if (end-begin<0.01) {
-                return getPointSub((end+begin)/2);
+        private Vector getClosestPointSub(Vector v, double begin, double end) {
+            if (end - begin < 0.01) {
+                return getPointSub((end + begin) / 2);
             }
-            double low=Double.MAX_VALUE;
-            double lowPoint=begin;
-            double high=Double.MAX_VALUE;
-            double highPoint=end;
-            double partSize=(end-begin)/20.0;
-            for (double i = begin; i < end; i+=partSize) {
+            double low = Double.MAX_VALUE;
+            double lowPoint = begin;
+            double high = Double.MAX_VALUE;
+            double highPoint = end;
+            double partSize = (end - begin) / 20.0;
+            for (double i = begin; i < end; i += partSize) {
                 double d = getPointSub(i).subtract(v).length();
-                if (d<high) {
-                    low=high;
-                    lowPoint=highPoint;
-                    high=d;
-                    highPoint=i;
-                }else if(d<low){
-                    low=d;
-                    lowPoint=i;
+                if (d < high) {
+                    low = high;
+                    lowPoint = highPoint;
+                    high = d;
+                    highPoint = i;
+                } else if (d < low) {
+                    low = d;
+                    lowPoint = i;
                 }
             }
-            if (lowPoint==highPoint) {
+            if (lowPoint == highPoint) {
                 return getPointSub(highPoint);
             }
-            if (lowPoint==begin&&highPoint==end) {
-                return getPointSub((end+begin)/2);
+            if (lowPoint == begin && highPoint == end) {
+                return getPointSub((end + begin) / 2);
             }
-            if (lowPoint<highPoint) {
+            if (lowPoint < highPoint) {
                 return getClosestPointSub(v, lowPoint, highPoint);
-            }else{
+            } else {
                 return getClosestPointSub(v, highPoint, lowPoint);
             }
         }
-        
-        private double getDistance(){
-            switch(lastTrackNr){
+
+        private double getDistance() {
+            switch (lastTrackNr) {
                 case 0:
                     return testTrackDistance;
                 case 1:
@@ -1185,10 +1199,9 @@ public class RobotRace extends Base {
                     Vector nextTangent = getCubicBezierTng(t + step, controlPoints[i + 0],
                             controlPoints[i + 1], controlPoints[i + 2],
                             controlPoints[i + 3]);
-                    // Calculates all the vertices of the intersection of the track at the first point.
+                                                        // Calculates all the vertices of the intersection of the track at the first point.
 
                     distance += Math.sqrt(Math.pow(next.x() - current.x(), 2) + Math.pow(next.y() - current.y(), 2) + Math.pow(next.z() - current.z(), 2));
-
 
                     Vector currentPerpendicular = currentTangent.cross(Vector.Z).normalized();
                     Vector currentPerpendicularInner = currentTangent.cross(Vector.Z).normalized().scale(-1);
@@ -1218,8 +1231,6 @@ public class RobotRace extends Base {
                             nextBaseOuter,
                             nextBaseInner);
 
-
-
                 }
             }
             gl.glEnd();
@@ -1237,7 +1248,8 @@ public class RobotRace extends Base {
                 Vector currentBaseOuter,
                 Vector currentBaseInner,
                 Vector nextBaseOuter,
-                Vector nextBaseInner) {
+                Vector nextBaseInner
+        ) {
 
             gl.glNormal3d(currentNormal.x(), currentNormal.y(), currentNormal.z());
             Material.NONE.use(gl);
@@ -1290,9 +1302,8 @@ public class RobotRace extends Base {
             gl.glTexCoord2d(1, 0);
             gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
 
-
-
         }
+
     }
 
     /**
@@ -1302,4 +1313,5 @@ public class RobotRace extends Base {
     public static void main(String args[]) {
         RobotRace robotRace = new RobotRace();
     }
+
 }
