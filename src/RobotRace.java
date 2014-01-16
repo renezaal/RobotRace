@@ -99,9 +99,6 @@ public class RobotRace extends Base {
 
         // Initialize the terrain
         terrain = new Terrain(this);
-        
-        // new tree
-        tree=new Tree(this, cd, 0, 0);
     }
 
     /**
@@ -250,14 +247,10 @@ public class RobotRace extends Base {
 
         // Draw race track
         raceTrack.draw(gs.trackNr);
-        
-        // draw tree
-tree.Draw();
-        
+
         // Draw terrain
         terrain.Draw();
     }
-    private Tree tree;
 
     /**
      * Draws the x-axis (red), y-axis (green), z-axis (blue), and origin
@@ -848,173 +841,152 @@ tree.Draw();
             
             // The test track is selected
             if (0 == trackNr) {
+                // Checks if display list is allready created                
                 if (testTrack == -1) {
-                   distance = 0;
+                    // Resets the distance
+                    distance = 0;
+                    // Creates a display list for the test track 
                    testTrack = gl.glGenLists(1);
-                   gl.glNewList(testTrack, GL_COMPILE);
+                    gl.glNewList(testTrack, GL_COMPILE);
                    
-                   gl.glBegin(GL_TRIANGLES);
+                    gl.glBegin(GL_TRIANGLES);
+                        // Loops true all te points from t = 0  to t = 1
                         for (double t = 0; t < 1; t += step) {
+                            // Calculates current point
                             Vector current = testTrackGetPoint(t);
+                            // Calculates next point
                             Vector next = testTrackGetPoint(t + step);
+                            // Calculates current tangent 
                             Vector currentTangent = testTrackGetTangent(t);
+                            // Calculates next tangent
                             Vector nextTangent = testTrackGetTangent(t + step);
                             
+                            // Calculates the distance from point to point with squarroot((x2-x1)^2 + (y2-y1)^2 + (z2-z1)^2) and adds it to distance collected so far
                             distance += Math.sqrt(Math.pow(next.x()-current.x(),2) + Math.pow(next.y()-current.y(),2) + Math.pow(next.z()-current.z(),2));
                                                    
+                            // Calculates the perpendicular vector (outside and inside) to the current tangent vector
                             Vector currentPerpendicular = currentTangent.cross(Vector.Z).normalized();
                             Vector currentPerpendicularInner = currentTangent.cross(Vector.Z).normalized().scale(-1);
+                            // Calculates the perpendicular vector (outside and inside) to the next tangent vector
                             Vector nextPerpendicular = nextTangent.cross(Vector.Z).normalized();
+                            // Calculates the inner and outer points for the current and next points (z=1)
                             Vector currentTrackOuter = current.add(currentPerpendicular.scale(2)).add(Vector.Z);
                             Vector currentTrackInner = current.add(currentPerpendicular.scale(-2)).add(Vector.Z);
                             Vector nextTrackOuter = next.add(nextPerpendicular.scale(2)).add(Vector.Z);
                             Vector nextTrackInner = next.add(nextPerpendicular.scale(-2)).add(Vector.Z);
                             
+                            // Calculates the inner and outer points for the current and next base points (z=0)
                             Vector currentBaseOuter = current.add(currentPerpendicular.scale(2));
                             Vector currentBaseInner = current.add(currentPerpendicular.scale(-2));
                             Vector nextBaseOuter = next.add(nextPerpendicular.scale(2));
                             Vector nextBaseInner = next.add(nextPerpendicular.scale(-2));
                             
+                            // Calculates a normal vector (in the z direction) the the plane
                             Vector currentNormal = currentPerpendicular.cross(currentTangent).normalized();
-                                                        
-                            gl.glNormal3d(currentNormal.x(), currentNormal.y(), currentNormal.z());
-                            Material.NONE.use(gl);
-
-
-                            gl.glEnable(GL_TEXTURE_2D);
-                            track.bind(gl);
-                            gl.glTexCoord2d(1, 0);
-                            gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
-                            gl.glTexCoord2d(1, 1);
-                            gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
-                            gl.glTexCoord2d(0, 1);
-                            gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
-                           
-                            gl.glTexCoord2d(1, 1);
-                            gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
-                            gl.glTexCoord2d(0, 0);
-                            gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
-                            gl.glTexCoord2d(0, 1);
-                            gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
                             
-                            gl.glNormal3d(currentPerpendicular.x(), currentPerpendicular.y(), currentPerpendicular.z());
-                            brick.bind(gl);
-                            gl.glTexCoord2d(0, 1);
-                            gl.glVertex3d(currentTrackOuter.x(), currentTrackOuter.y(), currentTrackOuter.z());
-                            gl.glTexCoord2d(0, 0);
-                            gl.glVertex3d(currentBaseOuter.x(), currentBaseOuter.y(), currentBaseOuter.z());
-                            gl.glTexCoord2d(1, 1);
-                            gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
-                            
-                            gl.glTexCoord2d(0, 0);
-                            gl.glVertex3d(currentBaseOuter.x(), currentBaseOuter.y(), currentBaseOuter.z());
-                            gl.glTexCoord2d(1, 0);
-                            gl.glVertex3d(nextBaseOuter.x(), nextBaseOuter.y(), nextBaseOuter.z());
-                            gl.glTexCoord2d(1, 1);
-                            gl.glVertex3d(nextTrackOuter.x(), nextTrackOuter.y(), nextTrackOuter.z());
-                            
-                            gl.glNormal3d(currentPerpendicularInner.x(), currentPerpendicularInner.y(), currentPerpendicularInner.z());
-                            
-                            gl.glTexCoord2d(0, 1);
-                            gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
-                            gl.glTexCoord2d(1, 0);
-                            gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
-                            gl.glTexCoord2d(1, 1);
-                            gl.glVertex3d(nextTrackInner.x(), nextTrackInner.y(), nextTrackInner.z());
-                            
-                            gl.glTexCoord2d(0, 1);
-                            gl.glVertex3d(currentTrackInner.x(), currentTrackInner.y(), currentTrackInner.z());
-                            gl.glTexCoord2d(0, 0);
-                            gl.glVertex3d(currentBaseInner.x(), currentBaseInner.y(), currentBaseInner.z());
-                            gl.glTexCoord2d(1, 0);
-                            gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
-                            
-                            
+                            // Draw the track
+                            drawTrack(  currentNormal, 
+                                        currentPerpendicular, 
+                                        currentPerpendicularInner,
+                                        currentTrackOuter,
+                                        currentTrackInner,
+                                        nextTrackOuter,
+                                        nextTrackInner,
+                                        currentBaseOuter,
+                                        currentBaseInner,
+                                        nextBaseOuter,
+                                        nextBaseInner   );
                             
                         }
                         gl.glEnd();
                         gl.glDisable(GL_TEXTURE_2D);
+                        // Ends the display list
                         gl.glEndList();
+                        // Sets the distance for the test track
                         testTrackDistance=distance;
                 } else {
+                        // Calls the display list
                         gl.glCallList(testTrack);
                 }         
             } else if (1 == trackNr) {
-                 if (oTrack == -1) {
-                    // Generate new list id.
+                // Checks if display list is allready created
+                if (oTrack == -1) {
+                    // Creates a display list for the O track 
                     oTrack = gl.glGenLists(2);
-                    // Creates a new display list.
-                    gl.glNewList(oTrack, GL_COMPILE);
-                                                
+                    gl.glNewList(oTrack, GL_COMPILE);                     
+                    // Calculates the points
                     drawCubicBezier(controlPointsOTrack);
-                                        
-                    gl.glEndList();
-                    
+                    // Ends the display list
+                    gl.glEndList();                    
+                    // Sets the distance for the O track
                     oTrackDistance=distance;
                 } else {
+                    // Calls the display list
                     gl.glCallList(oTrack);
                 }
 
 
                 // The L-track is selected
             } else if (2 == trackNr) {
-                 if (lTrack == -1) {
-                    // Generate new list id.
+                // Checks if display list is allready created
+                if (lTrack == -1) {
+                    // Creates a display list for the L track 
                     lTrack = gl.glGenLists(1);
-                    // Creates a new display list.
                     gl.glNewList(lTrack, GL_COMPILE);
-                                                
+                    // Calculates the points                            
                     drawCubicBezier(controlPointsLTrack);
-                                        
-                    gl.glEndList();
-                    
+                    // Ends the display list                    
+                    gl.glEndList();                    
+                    // Sets the distance for the L track
                     lTrackDistance=distance;
                 } else {
+                    // Calls the display list
                     gl.glCallList(lTrack);
                 }
 
                 // The C-track is selected
             } else if (3 == trackNr) {
-                 if (cTrack == -1) {
-                    // Generate new list id.
+                // Checks if display list is allready created
+                if (cTrack == -1) {
+                    // Creates a display list for the C track 
                     cTrack = gl.glGenLists(1);
-                    // Creates a new display list.
                     gl.glNewList(cTrack, GL_COMPILE);
-                                                
+                    // Calculates the points                           
                     drawCubicBezier(controlPointsCTrack);
-                                        
+                    // Ends the display list                   
                     gl.glEndList();
-                    
+                    // Sets the distance for the C track                   
                     cTrackDistance=distance;
                 } else {
+                    // Calls the display list
                     gl.glCallList(cTrack);
                 }
 
                 // The custom track is selected
             } else if (4 == trackNr) {
+                // Checks if display list is allready created
                 if (customTrack == -1) {
-                    // Generate new list id.
+                    // Creates a display list for the custom track 
                     customTrack = gl.glGenLists(1);
-                    // Creates a new display list.
                     gl.glNewList(customTrack, GL_COMPILE);
-                                                
+                    // Calculates the points
                     drawCubicBezier(controlPointsCustomTrack);
-                                        
+                    // Ends the display list                                        
                     gl.glEndList();
-                    
+                    // Sets the distance for the custom track
                     customTrackDistance=distance;
                 } else {
+                    // Calls the display list
                     gl.glCallList(customTrack);
                 }
 
             }
         }
 
-        /**
-         * Returns the position of the curve at 0 <= {@code t} <= 1.
-         */
+        // Return the point of the curve at a specified t
         private Vector testTrackGetPoint(double t) {
-           return new Vector(  10*Math.cos(2*Math.PI*t),
+            // for point.x 10cos(2PI*t), for point.y 14sin(2PI*t), for point.z 0
+            return new Vector(  10*Math.cos(2*Math.PI*t),
                                 14*Math.sin(2*Math.PI*t),
                                 0);
         }
@@ -1071,10 +1043,9 @@ tree.Draw();
            return getCubicBezierTng(t,track[part],track[part+1],track[part+2],track[part+3]);
                    }
         
-        /**
-         * Returns the tangent of the curve at 0 <= {@code t} <= 1.
-         */
+        // Return the tangent point of the curve at a specified t
         private Vector testTrackGetTangent(double t) {
+            // for point.x 20PI*-sin(2PI*t), for point.y 28PI*cos(2PI*t), for point.z 0
             return new Vector(  20*Math.PI*-Math.sin(2*Math.PI*t), 
                                 28*Math.PI*Math.cos(2*Math.PI*t), 
                                 0);
@@ -1125,8 +1096,8 @@ tree.Draw();
             }
         }
         
-        //http://en.wikipedia.org/wiki/B%C3%A9zier_curve
-        //B(t) = (1-t)^3 * Point0 + 3 * (1-t)^2 * t * Point 1 + 3 * (1-t) * t^2 * Point2 + t^3 * Point3
+        // Return the point of the bezier curve at a specified t
+        // B(t) = (1-t)^3 * Point0 + 3 * (1-t)^2 * t * Point 1 + 3 * (1-t) * t^2 * Point2 + t^3 * Point3
         public Vector getCubicBezierPnt(double t, Vector Point0, Vector Point1, Vector Point2, Vector Point3) {
              return new Vector( Math.pow(1 - t, 3) * Point0.x() + 3 * Math.pow(1 - t, 2) * t * Point1.x() + 3 * (1 - t) * Math.pow(t, 2)
                                 * Point2.x() + Math.pow(t, 3) * Point3.x(), 
@@ -1136,6 +1107,8 @@ tree.Draw();
                                 * Point2.z() + Math.pow(t, 3) * Point3.z());
         }
         
+        // Return the tangent point of the bezier curve at a specified t
+        // B'(t) = 3 * (1-t)^2 * (Point1 - Point 0) + 6 * (1-t) * t * (Point2 - Point1) + 3 * t^^2 * (Point3 - Point 2)
         public Vector getCubicBezierTng(double t, Vector Point0, Vector Point1, Vector Point2, Vector Point3) {
             return new Vector(  (3 * Math.pow(1 - t, 2) * (Point1.x() - Point0.x())) + (6 * (1 - t) * t * (Point2.x() 
                                 - Point1.x())) + (3 * Math.pow(t, 2) * (Point3.x() - Point2.x())),
@@ -1187,11 +1160,45 @@ tree.Draw();
                             Vector nextBaseInner = next.add(nextPerpendicular.scale(-2));
                             
                             Vector currentNormal = currentPerpendicular.cross(currentTangent).normalized();
-                                                        
-                            gl.glNormal3d(currentNormal.x(), currentNormal.y(), currentNormal.z());
                             
+                            // Draws the track
+                            drawTrack(  currentNormal, 
+                                        currentPerpendicular, 
+                                        currentPerpendicularInner,
+                                        currentTrackOuter,
+                                        currentTrackInner,
+                                        nextTrackOuter,
+                                        nextTrackInner,
+                                        currentBaseOuter,
+                                        currentBaseInner,
+                                        nextBaseOuter,
+                                        nextBaseInner   );
+                            
+                            
+                                                
+                             }
+                          }
+                    gl.glEnd();
+                    gl.glDisable(GL_TEXTURE_2D);
+        
+        }
+        
+        public void drawTrack(  Vector currentNormal, 
+                                Vector currentPerpendicular, 
+                                Vector currentPerpendicularInner,
+                                Vector currentTrackOuter,
+                                Vector currentTrackInner,
+                                Vector nextTrackOuter,
+                                Vector nextTrackInner,
+                                Vector currentBaseOuter,
+                                Vector currentBaseInner,
+                                Vector nextBaseOuter,
+                                Vector nextBaseInner
+                                ){
+                            
+                            gl.glNormal3d(currentNormal.x(), currentNormal.y(), currentNormal.z());
                             Material.NONE.use(gl);
-
+    
                             gl.glEnable(GL_TEXTURE_2D);
                             track.bind(gl);
                             gl.glTexCoord2d(1, 0);
@@ -1240,13 +1247,8 @@ tree.Draw();
                             gl.glTexCoord2d(1, 0);
                             gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
                             
-                            
-                                                
-                             }
-                          }
-                    gl.glEnd();
-                    gl.glDisable(GL_TEXTURE_2D);
-        
+
+            
         }
 
     }
