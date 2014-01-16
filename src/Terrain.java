@@ -19,6 +19,7 @@ public class Terrain {
 
     public Terrain(RobotRace rr) {
         this.rr = rr;
+        perlin = new PerlinNoise(897964513, 4, 6.0);
     }
     RobotRace rr;
     private GL2 gl;
@@ -32,23 +33,36 @@ public class Terrain {
     }
 
     private int displayListIndex = -1;
-    private double size = 75.0;
+    private double size = 25.0;
     private double waterHeight = 0;
     private boolean prepared = false;
     private int OneDColorId;
     private double gridSize = 0.5;
+    private PerlinNoise perlin;
 
     private void color(double height) {
-        if (height > 1.5) {
-            height = 1.5;
+        double max = (((double)colors.length)/2.0)-0.5;
+        if (height > max) {
+            height = max;
         } else if (height < -0.5) {
             height = -0.5;
         }
         height += 0.5;
-        height /= 2.0;
+        height /= max+0.5;
         gl.glTexCoord1d(height);
 
     }
+
+    private Color[] colors
+            = {
+                new Color(122, 184, 217),
+                new Color(232, 203, 126),
+                new Color(135, 191, 118),
+                new Color(135, 191, 118),
+                new Color(135, 191, 118),
+                new Color(102, 131, 92),
+                new Color(102, 131, 92),
+                new Color(70, 79, 68)};
 
     private double minMaxHeightCorrection(double h, double x, double y) {
         RobotRace.RaceTrack rt = rr.getTrack();
@@ -65,13 +79,8 @@ public class Terrain {
 
     private void prepare() {
         pre();
+        perlin = new PerlinNoise((int) (Math.random() * 10000.0), 4, 6.0);
 
-        Color[] colors = new Color[5];
-        colors[0] = new Color(122, 184, 217);
-        colors[1] = new Color(232, 203, 126);
-        colors[2] = new Color(135, 191, 118);
-        colors[3] = new Color(102, 131, 92);
-        colors[4] = new Color(70, 79, 68);
         OneDColorId = OneDTextureInit.create1DTexture(gl, colors);
 
         if (displayListIndex < 0) {
@@ -86,6 +95,9 @@ public class Terrain {
         for (double x = -size; x < size; x += gridSize) {
 
             for (double y = -size; y < size; y += gridSize) {
+                if (new Vector(x,y,0).length()>size) {
+                    continue;
+                }
                 double llH = heightAt(x, y);
                 double lrH = heightAt(x + gridSize, y);
                 double ulH = heightAt(x, y + gridSize);
@@ -147,8 +159,9 @@ public class Terrain {
 
         prepared = true;
     }
-    
-    public void ReDraw(){
+
+    public void ReDraw(double size) {
+        this.size=size;
         prepare();
     }
 
@@ -160,9 +173,13 @@ public class Terrain {
 
         gl.glCallList(displayListIndex);
     }
+    
+    public double getSize(){
+        return size;
+    }
 
     public double heightAt(double x, double y) {
-        double h = (0.6 * Math.cos(0.5 * x + 0.2 * y) + 0.4 * Math.cos(x - 0.8 * y)) * 1.5;
+        double h = perlin.noise2d(x, y) * 5.0;
         return minMaxHeightCorrection(h, x, y);
     }
 
