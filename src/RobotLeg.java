@@ -44,7 +44,7 @@ public class RobotLeg {
     private boolean front;
     private double upperLegLength = 0.325;
     private double lowerLegLength = 0.575;
-
+    private Vector up;
     private void pre() {
         gl = rr.getGL();
         glu = rr.getGLU();
@@ -59,8 +59,7 @@ public class RobotLeg {
         return front;
     }
 
-    private void setStep(Vector target) {
-
+    private void setStep(Vector target){
         // we're leaving ground
         onTheGround = false;
         // the target of the step is located in the new neutral zone
@@ -90,7 +89,8 @@ public class RobotLeg {
         return stepLength;
     }
 
-    public void Advance(Vector newNeutral, Vector attachment) {
+    public void Advance(Vector newNeutral, Vector attachment,Vector up) {
+this.up=up;
         if (Double.isNaN(foot.x()) || Double.isNaN(foot.y()) || Double.isNaN(foot.z())) {
             foot = newNeutral;
             onTheGround=true;
@@ -171,7 +171,7 @@ public class RobotLeg {
                 // length of the first and second limbs
                 (float) upperLegLength, (float) lowerLegLength,
                 // direction of the knee
-                Vector.Z,
+                up,
                 // shapes of the first limb, knee, second limb
                 CartesianDraw.Shape.Cylinder, CartesianDraw.Shape.Sphere, CartesianDraw.Shape.Cone,
                 // radius and detail level

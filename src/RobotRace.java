@@ -98,12 +98,26 @@ public class RobotRace extends Base {
 
         // Initialize the race track
         raceTrack = new RaceTrack();
-
+        
         // Initialize the terrain
         terrain = new Terrain(this);
 
-        Tree t = new Tree(this, cd, 0, 0);
+        // Initialize the trees
+        placeTrees();
+
+    }
+    
+    // places trees at random locations
+    private void placeTrees(){
+        int numberOfTrees=(int)(Math.random()*100.0);
+        for (int i = 0; i < numberOfTrees; i++) {
+            double x= Math.random()-0.5;
+            x*=100.0;
+            double y =Math.random()-0.5;
+            y*=100.0;
+        Tree t = new Tree(this, cd, terrain, x, y);
         trees.add(t);
+        }
     }
     private ArrayList<Tree> trees = new ArrayList<Tree>();
 
@@ -385,6 +399,15 @@ public class RobotRace extends Base {
                 new float[]{0f, 1f, 0f, 1.0f},
                 new float[]{0f, 1f, 0f, 1.0f},
                 new float[]{20f}),
+        /**
+         *
+         * Leaves material properties.
+         *
+         */
+        LEAVES(
+                new float[]{0.435f, 0.69f, 0.333f, 1.0f},
+                new float[]{0.16f, 0.4f, 0.07f, 1.0f},
+                new float[]{20f}),
         /* 
          *Red material properties
          */
@@ -472,8 +495,16 @@ public class RobotRace extends Base {
             return Vector.Z.cross(heading).normalized();
         }
 
+        private Vector up() {
+            return heading().cross(rightSide()).normalized();
+        }
+
         private Vector normal() {
             return heading.cross(rightSide());
+        }
+        
+        public double getDistance(){
+            return distance;
         }
         private float posX, posY, posZ;
         private RobotLeg[] legs = new RobotLeg[4];
@@ -530,6 +561,14 @@ public class RobotRace extends Base {
         private Vector eyePos(boolean rightEye) {
             double relX = rightEye ? 0.045 : -0.045;
             double relY = 0.285;
+            double relZ = 0.15;
+            return absolutePosition(relX, relY, relZ);
+        }
+        
+        // camera for first person
+        public Vector cameraPos() {
+            double relX = 0;
+            double relY = 0.5;
             double relZ = 0.15;
             return absolutePosition(relX, relY, relZ);
         }
@@ -615,7 +654,7 @@ public class RobotRace extends Base {
 
             //Legs
             for (RobotLeg leg : legs) {
-                leg.Advance(footPos(leg.isRight(), leg.isFront()), legPos(leg.isRight(), leg.isFront()));
+                leg.Advance(footPos(leg.isRight(), leg.isFront()), legPos(leg.isRight(), leg.isFront()), up());
             }
 
             //Left Eye
@@ -748,7 +787,7 @@ public class RobotRace extends Base {
          * helicopter mode.
          */
         private void setHelicopterMode() {
-            eye = raceTrack.getPoint(loop - 12).add(up.scale(Math.sin(loop) + 10));
+            eye = raceTrack.getPoint(loop - 12).add(up.scale(Math.sin(loop/3.0) + 10)).add(Vector.X.normalized().scale(Math.sin(loop/3.1) + 10));
             center = robots[0].pos();
         }
 
@@ -758,18 +797,20 @@ public class RobotRace extends Base {
          */
         private void setMotorCycleMode() {
             Robot robot = robots[0];
-            Vector pos=robot.pos();
-            Vector h=robot.heading();
-            eye=pos.add(h.cross(Vector.Z).normalized().scale(- 2.0)).add(Vector.Z.scale(Math.sin(loop/20)*0.2+0.4));
-            center=pos;
+            Vector pos = robot.pos();
+            Vector h = robot.heading();
+            eye = pos.add(h.cross(Vector.Z).normalized().scale(-2.0)).add(Vector.Z.scale(Math.sin(loop / 20) * 0.2 + 0.4));
+            center = pos;
         }
 
         /**
          * Computes {@code eye}, {@code center}, and {@code up}, based on the
          * first person mode.
          */
-        
         private void setFirstPersonMode() {
+            Robot robot = robots[0];
+            eye=robot.cameraPos();
+            center=raceTrack.getPoint(robot.getDistance()+15.0);
         }
 
     }
@@ -824,16 +865,16 @@ public class RobotRace extends Base {
          */
         private Vector[] controlPointsCustomTrack = {
             new Vector(0, 40, 0), new Vector(0, 30, 0), new Vector(0, 30, 0), new Vector(-10, 30, 0),
-            new Vector(-10, 30, 0), new Vector(-20, 30, 0), new Vector(-20, 30, 0), new Vector(-20, 10, 0),
-            new Vector(-20, 10, 0), new Vector(-20, -10, 0), new Vector(-20, -10, 0), new Vector(-50, -10, 0),
-            new Vector(-50, -10, 0), new Vector(-60, -10, 0), new Vector(-60, -40, 0), new Vector(-50, -40, 0),
+            new Vector(-10, 30, 0), new Vector(-20, 30, 2), new Vector(-20, 30, 2), new Vector(-20, 10, 4),
+            new Vector(-20, 10, 4), new Vector(-20, -10, 5), new Vector(-20, -10, 5), new Vector(-50, -10, 4),
+            new Vector(-50, -10, 4), new Vector(-60, -10, 3), new Vector(-60, -40, 2), new Vector(-50, -40, 0),
             new Vector(-50, -40, 0), new Vector(-30, -40, 0), new Vector(-30, -40, 0), new Vector(-30, -30, 0),
             new Vector(-30, -30, 0), new Vector(-30, -20, 0), new Vector(-30, -20, 0), new Vector(-20, -20, 0),
             new Vector(-20, -20, 0), new Vector(-10, -20, 0), new Vector(-10, -20, 0), new Vector(-10, -60, 0),
             new Vector(-10, -60, 0), new Vector(-10, -70, 0), new Vector(10, -70, 0), new Vector(10, -60, 0),
-            new Vector(10, -60, 0), new Vector(10, -40, 0), new Vector(10, -40, 0), new Vector(20, -40, 0),
-            new Vector(20, -40, 0), new Vector(30, -40, 0), new Vector(30, -40, 0), new Vector(30, 0, 0),
-            new Vector(30, 0, 0), new Vector(30, 10, 0), new Vector(10, 10, 0), new Vector(10, 0, 0),
+            new Vector(10, -60, 0), new Vector(10, -40, 3), new Vector(10, -40, 3), new Vector(20, -40, 6),
+            new Vector(20, -40, 6), new Vector(30, -40, 8), new Vector(30, -40, 8), new Vector(30, 0, 6),
+            new Vector(30, 0, 6), new Vector(30, 10, 4), new Vector(10, 10, 2), new Vector(10, 0, 0),
             new Vector(10, 0, 0), new Vector(10, -20, 0), new Vector(10, -20, 0), new Vector(0, -20, 0),
             new Vector(0, -20, 0), new Vector(-10, -20, 0), new Vector(-10, 20, 0), new Vector(0, 20, 0),
             new Vector(0, 20, 0), new Vector(20, 20, 0), new Vector(20, 20, 0), new Vector(20, 30, 0),
@@ -853,11 +894,13 @@ public class RobotRace extends Base {
         public void draw(int trackNr) {
             redraw = trackNr != lastTrackNr;
             lastTrackNr = trackNr;
+            double size=15;
             double numberOfSteps = 200;
             double step = 1 / numberOfSteps;
 
             // The test track is selected
             if (0 == trackNr) {
+                size=20;
                 // Checks if display list is allready created                
                 if (testTrack == -1) {
                     // Resets the distance
@@ -900,9 +943,11 @@ public class RobotRace extends Base {
 
                         // Calculates a normal vector (in the z direction) the the plane
                         Vector currentNormal = currentPerpendicular.cross(currentTangent).normalized();
+                        Vector currentNormalInner = currentNormal.scale(-1);
 
                         // Draw the track
                         drawTrack(currentNormal,
+                                currentNormalInner,
                                 currentPerpendicular,
                                 currentPerpendicularInner,
                                 currentTrackOuter,
@@ -926,6 +971,7 @@ public class RobotRace extends Base {
                     gl.glCallList(testTrack);
                 }
             } else if (1 == trackNr) {
+                size=30;
                 // Checks if display list is allready created
                 if (oTrack == -1) {
                     // Creates a display list for the O track 
@@ -944,6 +990,7 @@ public class RobotRace extends Base {
 
                 // The L-track is selected
             } else if (2 == trackNr) {
+                size=55;
                 // Checks if display list is allready created
                 if (lTrack == -1) {
                     // Creates a display list for the L track 
@@ -962,6 +1009,7 @@ public class RobotRace extends Base {
 
                 // The C-track is selected
             } else if (3 == trackNr) {
+                size=40;
                 // Checks if display list is allready created
                 if (cTrack == -1) {
                     // Creates a display list for the C track 
@@ -980,6 +1028,7 @@ public class RobotRace extends Base {
 
                 // The custom track is selected
             } else if (4 == trackNr) {
+                size=75;
                 // Checks if display list is allready created
                 if (customTrack == -1) {
                     // Creates a display list for the custom track 
@@ -992,13 +1041,26 @@ public class RobotRace extends Base {
                     // Sets the distance for the custom track
                     customTrackDistance = distance;
                 } else {
+                    
                     // Calls the display list
                     gl.glCallList(customTrack);
                 }
 
             }
             if (redraw) {
-                terrain.ReDraw();
+                terrain.ReDraw(size);
+            }
+        }
+        
+        private void drawPillars(int amount){
+            double partSize = 1.0/((double)amount);
+            for (int i = 0; i < amount; i++) {
+               Vector currentPoint= getPointSub(((double)i)*partSize);
+               float x= (float)currentPoint.x();
+               float y=(float)currentPoint.y();
+               float upperZ=(float)currentPoint.z()-0.3f;
+               float lowerZ= -10f;
+                cd.Rectangle(x, y, upperZ, x, y, lowerZ, 0.8f);
             }
         }
 
@@ -1106,7 +1168,7 @@ public class RobotRace extends Base {
             double lowPoint = begin;
             double high = Double.MAX_VALUE;
             double highPoint = end;
-            double partSize = (end - begin) / 20.0;
+            double partSize = (end - begin) / 40.0;
             for (double i = begin; i < end; i += partSize) {
                 double d = getPointSub(i).subtract(v).length();
                 if (d < high) {
@@ -1187,7 +1249,7 @@ public class RobotRace extends Base {
         }
 
         public void drawCubicBezier(Vector[] controlPoints) {
-            double numberOfSteps = 200;
+            double numberOfSteps = 50;
             double step = 1 / numberOfSteps;
 
             gl.glBegin(GL_TRIANGLES);
@@ -1227,9 +1289,11 @@ public class RobotRace extends Base {
                     Vector nextBaseInner = next.add(nextPerpendicular.scale(-2));
 
                     Vector currentNormal = currentPerpendicular.cross(currentTangent).normalized();
+                    Vector currentNormalInner = currentNormal.scale(-1);
 
                     // Draws the track
                     drawTrack(currentNormal,
+                            currentNormalInner,
                             currentPerpendicular,
                             currentPerpendicularInner,
                             currentTrackOuter,
@@ -1245,10 +1309,12 @@ public class RobotRace extends Base {
             }
             gl.glEnd();
             gl.glDisable(GL_TEXTURE_2D);
-
+            drawPillars(50);
         }
 
-        public void drawTrack(Vector currentNormal,
+        public void drawTrack(
+                Vector currentNormal,
+                Vector currentNormalInner,
                 Vector currentPerpendicular,
                 Vector currentPerpendicularInner,
                 Vector currentTrackOuter,
@@ -1310,6 +1376,23 @@ public class RobotRace extends Base {
             gl.glTexCoord2d(0, 0);
             gl.glVertex3d(currentBaseInner.x(), currentBaseInner.y(), currentBaseInner.z());
             gl.glTexCoord2d(1, 0);
+            gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
+
+            gl.glNormal3d(currentNormalInner.x(), currentNormalInner.y(), currentNormalInner.z());
+
+            brick.bind(gl);
+            gl.glTexCoord2d(1, 0);
+            gl.glVertex3d(currentBaseOuter.x(), currentBaseOuter.y(), currentBaseOuter.z());
+            gl.glTexCoord2d(1, 1);
+            gl.glVertex3d(nextBaseOuter.x(), nextBaseOuter.y(), nextBaseOuter.z());
+            gl.glTexCoord2d(0, 1);
+            gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
+
+            gl.glTexCoord2d(1, 1);
+            gl.glVertex3d(currentBaseOuter.x(), currentBaseOuter.y(), currentBaseOuter.z());
+            gl.glTexCoord2d(0, 0);
+            gl.glVertex3d(currentBaseInner.x(), currentBaseInner.y(), currentBaseInner.z());
+            gl.glTexCoord2d(0, 1);
             gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
 
         }
