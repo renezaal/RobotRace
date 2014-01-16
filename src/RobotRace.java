@@ -99,6 +99,9 @@ public class RobotRace extends Base {
 
         // Initialize the terrain
         terrain = new Terrain(this);
+        
+        // new tree
+        tree=new Tree(this, cd, 0, 0);
     }
 
     /**
@@ -247,10 +250,14 @@ public class RobotRace extends Base {
 
         // Draw race track
         raceTrack.draw(gs.trackNr);
-
+        
+        // draw tree
+tree.Draw();
+        
         // Draw terrain
         terrain.Draw();
     }
+    private Tree tree;
 
     /**
      * Draws the x-axis (red), y-axis (green), z-axis (blue), and origin
