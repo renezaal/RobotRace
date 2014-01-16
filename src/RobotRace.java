@@ -1,10 +1,8 @@
 
 import com.jogamp.opengl.util.gl2.GLUT;
 import com.jogamp.opengl.util.texture.Texture;
-import java.awt.geom.Point2D;
+import java.util.ArrayList;
 import java.util.Date;
-import static javax.media.opengl.GL.GL_TEXTURE_2D;
-import static javax.media.opengl.GL.GL_TRIANGLES;
 import javax.media.opengl.GL2;
 import static javax.media.opengl.GL2.*;
 import javax.media.opengl.glu.GLU;
@@ -99,7 +97,11 @@ public class RobotRace extends Base {
 
         // Initialize the terrain
         terrain = new Terrain(this);
+        
+        Tree t = new Tree(this, cd, 0, 0);
+        trees.add(t);
     }
+    private ArrayList<Tree> trees = new ArrayList<Tree>();
 
     /**
      * Called upon the start of the application. Primarily used to configure
@@ -247,6 +249,11 @@ public class RobotRace extends Base {
 
         // Draw race track
         raceTrack.draw(gs.trackNr);
+        
+        // Draw the trees
+        for (Tree tree : trees) {
+            tree.Draw();
+        }
 
         // Draw terrain
         terrain.Draw();
