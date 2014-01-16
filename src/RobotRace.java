@@ -839,9 +839,7 @@ public class RobotRace extends Base {
          * Draws this track, based on the selected track number.
          */
         public void draw(int trackNr) {
-            if (trackNr != lastTrackNr) {
-                redraw = true;
-            }
+            redraw = trackNr != lastTrackNr;
             lastTrackNr = trackNr;
             double numberOfSteps = 200;
             double step = 1 / numberOfSteps;
@@ -1199,7 +1197,7 @@ public class RobotRace extends Base {
                     Vector nextTangent = getCubicBezierTng(t + step, controlPoints[i + 0],
                             controlPoints[i + 1], controlPoints[i + 2],
                             controlPoints[i + 3]);
-                                                        // Calculates all the vertices of the intersection of the track at the first point.
+                    // Calculates all the vertices of the intersection of the track at the first point.
 
                     distance += Math.sqrt(Math.pow(next.x() - current.x(), 2) + Math.pow(next.y() - current.y(), 2) + Math.pow(next.z() - current.z(), 2));
 
