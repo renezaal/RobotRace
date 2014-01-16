@@ -880,15 +880,15 @@ newPos();
         boolean redraw = false;
 
         /**
-         * Array with control points for the O-track.
-         */
+* Array with control points for the O-track.
+*/
         private Vector[] controlPointsOTrack = {
             new Vector(0, -20, 0), new Vector(30, -20, 0), new Vector(30, 20, 0), new Vector(0, 20, 0),
             new Vector(0, 20, 0), new Vector(-30, 20, 0), new Vector(-30, -20, 0), new Vector(0, -20, 0)
         };
         /**
-         * Array with control points for the L-track.
-         */
+* Array with control points for the L-track.
+*/
         private Vector[] controlPointsLTrack = {
             new Vector(-20, 40, 0), new Vector(-20, -20, 0), new Vector(-20, -20, 0), new Vector(20, -20, 0),
             new Vector(20, -20, 0), new Vector(30, -20, 0), new Vector(30, 0, 0), new Vector(20, 0, 0),
@@ -896,8 +896,8 @@ newPos();
             new Vector(0, 40, 0), new Vector(0, 50, 0), new Vector(-20, 50, 0), new Vector(-20, 40, 0),};
 
         /**
-         * Array with control points for the C-track.
-         */
+* Array with control points for the C-track.
+*/
         private Vector[] controlPointsCTrack = {
             new Vector(10, 10, 0), new Vector(0, 10, 0), new Vector(0, -10, 0), new Vector(10, -10, 0),
             new Vector(10, -10, 0), new Vector(20, -10, 0), new Vector(20, -30, 0), new Vector(10, -30, 0),
@@ -906,8 +906,8 @@ newPos();
         };
 
         /**
-         * Array with control points for the custom track.
-         */
+* Array with control points for the custom track.
+*/
         private Vector[] controlPointsCustomTrack = {
             new Vector(0, 40, 0), new Vector(0, 30, 0), new Vector(0, 30, 0), new Vector(-10, 30, 0),
             new Vector(-10, 30, 0), new Vector(-20, 30, 2), new Vector(-20, 30, 2), new Vector(-20, 10, 4),
@@ -927,41 +927,41 @@ newPos();
             new Vector(10, 50, 0), new Vector(0, 50, 0), new Vector(0, 50, 0), new Vector(0, 40, 0),};
 
         /**
-         * Constructs the race track, sets up display lists.
-         */
+* Constructs the race track, sets up display lists.
+*/
         public RaceTrack() {
 
         }
 
         /**
-         * Draws this track, based on the selected track number.
-         */
+* Draws this track, based on the selected track number.
+*/
         public void draw(int trackNr) {
             redraw = trackNr != lastTrackNr;
             lastTrackNr = trackNr;
-            double size = 15;
+            double size=15;
             double numberOfSteps = 200;
             double step = 1 / numberOfSteps;
 
             // The test track is selected
             if (0 == trackNr) {
-                size = 20;
-                // Checks if display list is allready created                
+                size=20;
+                // Checks if display list is allready created
                 if (testTrack == -1) {
                     // Resets the distance
                     distance = 0;
-                    // Creates a display list for the test track 
+                    // Creates a display list for the test track
                     testTrack = gl.glGenLists(1);
                     gl.glNewList(testTrack, GL_COMPILE);
 
                     gl.glBegin(GL_TRIANGLES);
-                    // Loops true all te points from t = 0  to t = 1
+                    // Loops true all te points from t = 0 to t = 1
                     for (double t = 0; t < 1; t += step) {
                         // Calculates current point
                         Vector current = testTrackGetPoint(t);
                         // Calculates next point
                         Vector next = testTrackGetPoint(t + step);
-                        // Calculates current tangent 
+                        // Calculates current tangent
                         Vector currentTangent = testTrackGetTangent(t);
                         // Calculates next tangent
                         Vector nextTangent = testTrackGetTangent(t + step);
@@ -1016,10 +1016,10 @@ newPos();
                     gl.glCallList(testTrack);
                 }
             } else if (1 == trackNr) {
-                size = 30;
+                size=30;
                 // Checks if display list is allready created
                 if (oTrack == -1) {
-                    // Creates a display list for the O track 
+                    // Creates a display list for the O track
                     oTrack = gl.glGenLists(2);
                     gl.glNewList(oTrack, GL_COMPILE);
                     // Calculates the points
@@ -1035,15 +1035,15 @@ newPos();
 
                 // The L-track is selected
             } else if (2 == trackNr) {
-                size = 55;
+                size=55;
                 // Checks if display list is allready created
                 if (lTrack == -1) {
-                    // Creates a display list for the L track 
+                    // Creates a display list for the L track
                     lTrack = gl.glGenLists(1);
                     gl.glNewList(lTrack, GL_COMPILE);
-                    // Calculates the points                            
+                    // Calculates the points
                     drawCubicBezier(controlPointsLTrack);
-                    // Ends the display list                    
+                    // Ends the display list
                     gl.glEndList();
                     // Sets the distance for the L track
                     lTrackDistance = distance;
@@ -1054,17 +1054,17 @@ newPos();
 
                 // The C-track is selected
             } else if (3 == trackNr) {
-                size = 40;
+                size=40;
                 // Checks if display list is allready created
                 if (cTrack == -1) {
-                    // Creates a display list for the C track 
+                    // Creates a display list for the C track
                     cTrack = gl.glGenLists(1);
                     gl.glNewList(cTrack, GL_COMPILE);
-                    // Calculates the points                           
+                    // Calculates the points
                     drawCubicBezier(controlPointsCTrack);
-                    // Ends the display list                   
+                    // Ends the display list
                     gl.glEndList();
-                    // Sets the distance for the C track                   
+                    // Sets the distance for the C track
                     cTrackDistance = distance;
                 } else {
                     // Calls the display list
@@ -1073,20 +1073,20 @@ newPos();
 
                 // The custom track is selected
             } else if (4 == trackNr) {
-                size = 75;
+                size=75;
                 // Checks if display list is allready created
                 if (customTrack == -1) {
-                    // Creates a display list for the custom track 
+                    // Creates a display list for the custom track
                     customTrack = gl.glGenLists(1);
                     gl.glNewList(customTrack, GL_COMPILE);
                     // Calculates the points
                     drawCubicBezier(controlPointsCustomTrack);
-                    // Ends the display list                                        
+                    // Ends the display list
                     gl.glEndList();
                     // Sets the distance for the custom track
                     customTrackDistance = distance;
                 } else {
-
+                    
                     // Calls the display list
                     gl.glCallList(customTrack);
                 }
@@ -1096,15 +1096,15 @@ newPos();
                 terrain.ReDraw(size);
             }
         }
-
-        private void drawPillars(int amount) {
-            double partSize = 1.0 / ((double) amount);
+        
+        private void drawPillars(int amount){
+            double partSize = 1.0/((double)amount);
             for (int i = 0; i < amount; i++) {
-                Vector currentPoint = getPointSub(((double) i) * partSize);
-                float x = (float) currentPoint.x();
-                float y = (float) currentPoint.y();
-                float upperZ = (float) currentPoint.z() - 0.3f;
-                float lowerZ = -10f;
+               Vector currentPoint= getPointSub(((double)i)*partSize);
+               float x= (float)currentPoint.x();
+               float y=(float)currentPoint.y();
+               float upperZ=(float)currentPoint.z()-0.3f;
+               float lowerZ= -10f;
                 cd.Rectangle(x, y, upperZ, x, y, lowerZ, 0.8f);
             }
         }
@@ -1443,6 +1443,8 @@ newPos();
         }
 
     }
+
+
 
     /**
      * Main program execution body, delegates to an instance of the RobotRace
