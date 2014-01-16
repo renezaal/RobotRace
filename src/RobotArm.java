@@ -13,6 +13,7 @@ import javax.media.opengl.glu.GLU;
 import robotrace.Base;
 import robotrace.Vector;
 /**
+ * contains the code for the arms of the robots
  *
  * @author Administrator
  */
@@ -21,6 +22,7 @@ public class RobotArm {
         this.rr=rr;
         this.cd=cd;
         pos=start;
+        // the direction the elbow is pointing towards
         elbowDir=new Vector(right?-1:1, 0, -1);
         this.right =right;
     }
@@ -46,10 +48,11 @@ public class RobotArm {
     public void Draw(){
         pre();
         
-        
-        
-        Vector end = new Vector(right?-0.0125:0.0125, 0.2, -0.025);
+        // indicates the end of the arm
+        Vector end = new Vector(right?-0.0125:0.0125, 0.2, -0.025*Math.sin(rr.getLoop()));
         end=end.add(pos);
+        
+        // draw the full arm
         cd.Joint(pos, end, (float)upperArmLength, (float)lowerArmLength, elbowDir, 0.02f, 10);
     }
 }

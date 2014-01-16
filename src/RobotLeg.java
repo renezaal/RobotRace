@@ -66,7 +66,7 @@ public class RobotLeg {
         stepTarget = target;
         stepStart = footProjection;
         // the maximum distance is randomized a bit
-        maxDistance = (Math.random() * 0.125) + 0.125;
+        maxDistance = (Math.random() * 0.175) + 0.175;
         // the starting point is where the foot is now. 
         stepStart = footProjection;
         // we just started moving
@@ -139,7 +139,7 @@ this.up=up;
             // calculate the direction in which the foot should move, do not bother with the z value
             Vector stepDirection = stepTarget.subtract(footProjection).normalized();
             // move the foot toward the target
-            footProjection = footProjection.add(stepDirection.scale((4.0*stepLength(time) * time)+(time*time)+(2.0*time)));
+            footProjection = footProjection.add(stepDirection.scale((4.0*stepLength(time) * time)+(time*time)+(3.0*time)));
 // calculate the distance the foot has moved since the start of the step. again, don't bother with the z value
             double distanceMoved = stepStart.subtract(footProjection).length();
             // instantiate the variable that is going to contain the z value of the foot
@@ -147,12 +147,12 @@ this.up=up;
 
             if (stepLength(time) == 0) {
                 stepStartTime += time;
-                footZ = (1.0 - Math.pow((stepStartTime / 0.25) - 1.0, 2)) * 0.075;
+                footZ = (1.0 - Math.pow((stepStartTime / 0.25) - 1.0, 2)) * 0.1;
             } else if (distanceMoved > stepLength(time)) {
                 // if we've moved beyond our target we don't modify the height
                 footZ = 0;
             } else {
-                footZ = (1.0 - Math.pow(((distanceMoved / stepLength(time)) * 2) - 1.0, 2)) * 0.075;
+                footZ = (1.0 - Math.pow(((distanceMoved / stepLength(time)) * 2) - 1.0, 2)) * 0.1;
             }
             foot = footProjection.add(Vector.Z.scale(footZ));
         }

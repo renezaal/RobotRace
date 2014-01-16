@@ -1,4 +1,3 @@
-
 import com.jogamp.opengl.util.gl2.GLUT;
 import com.jogamp.opengl.util.texture.Texture;
 import java.util.ArrayList;
@@ -98,7 +97,7 @@ public class RobotRace extends Base {
 
         // Initialize the race track
         raceTrack = new RaceTrack();
-        
+
         // Initialize the terrain
         terrain = new Terrain(this);
 
@@ -106,17 +105,17 @@ public class RobotRace extends Base {
         placeTrees();
 
     }
-    
+
     // places trees at random locations
-    private void placeTrees(){
-        int numberOfTrees=(int)(Math.random()*100.0);
+    private void placeTrees() {
+        int numberOfTrees = (int) (Math.random() * 100.0);
         for (int i = 0; i < numberOfTrees; i++) {
-            double x= Math.random()-0.5;
-            x*=100.0;
-            double y =Math.random()-0.5;
-            y*=100.0;
-        Tree t = new Tree(this, cd, terrain, x, y);
-        trees.add(t);
+            double x = Math.random() - 0.5;
+            x *= 100.0;
+            double y = Math.random() - 0.5;
+            y *= 100.0;
+            Tree t = new Tree(this, cd, terrain, x, y);
+            trees.add(t);
         }
     }
     private ArrayList<Tree> trees = new ArrayList<Tree>();
@@ -211,6 +210,11 @@ public class RobotRace extends Base {
 // gets the time between this draw and the previous one
     public double getTime() {
         return timePassed;
+    }
+
+    // gets the value of the main time loop
+    public double getLoop() {
+        return loop;
     }
 // calculates the time that passed since the last time this method was called
 
@@ -473,6 +477,18 @@ public class RobotRace extends Base {
         return brick;
     }
 
+    public int getRacePos(Robot r) {
+        int pos = 1;
+        for (Robot robot : robots) {
+            if (robot != r) {
+                if (robot.getDistance() > r.distance) {
+                    pos++;
+                }
+            }
+        }
+        return pos;
+    }
+
     /**
      * Represents a Robot, to be implemented according to the Assignments.
      */
@@ -502,8 +518,8 @@ public class RobotRace extends Base {
         private Vector normal() {
             return heading.cross(rightSide());
         }
-        
-        public double getDistance(){
+
+        public double getDistance() {
             return distance;
         }
         private float posX, posY, posZ;
@@ -517,6 +533,48 @@ public class RobotRace extends Base {
         private RobotRace rr;
         private double time;
         private int lane;
+        private double boost = 5;
+        private boolean boosting = false;
+
+        private void newPos() {
+            double position = (double) rr.getRacePos(this);
+            time = rr.getTime();
+            if (boosting) {
+                boost -= time;
+                if (boost < 0) {
+                    boosting = false;
+                }
+            } else {
+                boost += time;
+                if (boost > 5) {
+                    boosting = (Math.random() + (position / 10.0)) > 0.9;
+                }
+            }
+
+            Vector loc = rr.raceTrack.getPoint(distance);
+            Vector h = rr.raceTrack.getTangent(distance);
+
+            double acceleration = (position * 0.1) + Math.random()*0.1;
+            acceleration -= Math.random()*0.1;
+            acceleration *= time * time;
+            speed += acceleration;
+            if (speed > 1.5) {
+                speed = 4;
+            }
+            if (speed < 0.5) {
+                speed = 0.5;
+            }
+            speed+=boosting ? 1 : 0;
+            distance += time * speed;
+            loc = raceTrack.getPoint(distance);
+            loc = loc.add(h.cross(Vector.Z).normalized().scale(((double) lane) - 1.5));
+
+            posX = (float) loc.x();
+            posY = (float) loc.y();
+            posZ = (float) loc.z();
+            this.heading = h.normalized();
+
+        }
 
         /**
          * Constructs the robot with initial parameters.
@@ -564,7 +622,7 @@ public class RobotRace extends Base {
             double relZ = 0.15;
             return absolutePosition(relX, relY, relZ);
         }
-        
+
         // camera for first person
         public Vector cameraPos() {
             double relX = 0;
@@ -587,7 +645,7 @@ public class RobotRace extends Base {
 
         private Vector footPos(boolean rightFoot, boolean front) {
             double relX = rightFoot ? 0.45 : -0.45;
-            double relY = front ? 0.1 : -0.175;
+            double relY = front ? 0.15 : -0.125;
             double relZ = -dGround;
             return absolutePosition(relX, relY, relZ);
         }
@@ -596,20 +654,7 @@ public class RobotRace extends Base {
          * Draws this robot (as a {@code stickfigure} if specified).
          */
         public void draw(boolean stickFigure) {
-
-            time = rr.getTime();
-
-            distance += time * speed;
-
-            Vector loc = rr.raceTrack.getPoint(distance);
-            Vector h = rr.raceTrack.getTangent(distance);
-            loc = loc.add(h.cross(Vector.Z).normalized().scale(((double) lane) - 1.5));
-
-            posX = (float) loc.x();
-            posY = (float) loc.y();
-            posZ = (float) loc.z();
-            this.heading = h.normalized();
-
+newPos();
             gl.glPushMatrix();
 
             // set the material properties
@@ -787,7 +832,7 @@ public class RobotRace extends Base {
          * helicopter mode.
          */
         private void setHelicopterMode() {
-            eye = raceTrack.getPoint(loop - 12).add(up.scale(Math.sin(loop/3.0) + 10)).add(Vector.X.normalized().scale(Math.sin(loop/3.1) + 10));
+            eye = raceTrack.getPoint(loop - 12).add(up.scale(Math.sin(loop / 3.0) + 10)).add(Vector.X.normalized().scale(Math.sin(loop / 3.1) + 10));
             center = robots[0].pos();
         }
 
@@ -809,8 +854,8 @@ public class RobotRace extends Base {
          */
         private void setFirstPersonMode() {
             Robot robot = robots[0];
-            eye=robot.cameraPos();
-            center=raceTrack.getPoint(robot.getDistance()+15.0);
+            eye = robot.cameraPos();
+            center = raceTrack.getPoint(robot.getDistance() + 15.0);
         }
 
     }
@@ -894,13 +939,13 @@ public class RobotRace extends Base {
         public void draw(int trackNr) {
             redraw = trackNr != lastTrackNr;
             lastTrackNr = trackNr;
-            double size=15;
+            double size = 15;
             double numberOfSteps = 200;
             double step = 1 / numberOfSteps;
 
             // The test track is selected
             if (0 == trackNr) {
-                size=20;
+                size = 20;
                 // Checks if display list is allready created                
                 if (testTrack == -1) {
                     // Resets the distance
@@ -971,7 +1016,7 @@ public class RobotRace extends Base {
                     gl.glCallList(testTrack);
                 }
             } else if (1 == trackNr) {
-                size=30;
+                size = 30;
                 // Checks if display list is allready created
                 if (oTrack == -1) {
                     // Creates a display list for the O track 
@@ -990,7 +1035,7 @@ public class RobotRace extends Base {
 
                 // The L-track is selected
             } else if (2 == trackNr) {
-                size=55;
+                size = 55;
                 // Checks if display list is allready created
                 if (lTrack == -1) {
                     // Creates a display list for the L track 
@@ -1009,7 +1054,7 @@ public class RobotRace extends Base {
 
                 // The C-track is selected
             } else if (3 == trackNr) {
-                size=40;
+                size = 40;
                 // Checks if display list is allready created
                 if (cTrack == -1) {
                     // Creates a display list for the C track 
@@ -1028,7 +1073,7 @@ public class RobotRace extends Base {
 
                 // The custom track is selected
             } else if (4 == trackNr) {
-                size=75;
+                size = 75;
                 // Checks if display list is allready created
                 if (customTrack == -1) {
                     // Creates a display list for the custom track 
@@ -1041,7 +1086,7 @@ public class RobotRace extends Base {
                     // Sets the distance for the custom track
                     customTrackDistance = distance;
                 } else {
-                    
+
                     // Calls the display list
                     gl.glCallList(customTrack);
                 }
@@ -1051,15 +1096,15 @@ public class RobotRace extends Base {
                 terrain.ReDraw(size);
             }
         }
-        
-        private void drawPillars(int amount){
-            double partSize = 1.0/((double)amount);
+
+        private void drawPillars(int amount) {
+            double partSize = 1.0 / ((double) amount);
             for (int i = 0; i < amount; i++) {
-               Vector currentPoint= getPointSub(((double)i)*partSize);
-               float x= (float)currentPoint.x();
-               float y=(float)currentPoint.y();
-               float upperZ=(float)currentPoint.z()-0.3f;
-               float lowerZ= -10f;
+                Vector currentPoint = getPointSub(((double) i) * partSize);
+                float x = (float) currentPoint.x();
+                float y = (float) currentPoint.y();
+                float upperZ = (float) currentPoint.z() - 0.3f;
+                float lowerZ = -10f;
                 cd.Rectangle(x, y, upperZ, x, y, lowerZ, 0.8f);
             }
         }

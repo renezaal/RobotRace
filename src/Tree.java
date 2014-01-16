@@ -127,6 +127,15 @@ public class Tree {
             gl.glPushMatrix();
             cd.Orb((float) (x - r3), (float) (y - r4), (float) (height - r10), (float) (radius * r13 * 1.3), 10);
             gl.glPopMatrix();
+            gl.glPushMatrix();
+            cd.Orb((float) (x + r1), (float) y, (float) (height-r8), (float) (radius*r11*1.3), 10);
+            gl.glPopMatrix();
+            gl.glPushMatrix();
+            cd.Orb((float) x, (float) (y + r2), (float) (height-r9), (float) (radius*r12*1.3), 10);
+            gl.glPopMatrix();
+            gl.glPushMatrix();
+            cd.Orb((float) (x - r3), (float) (y - r4), (float) (height-r10), (float) (radius*r13*1.3), 10);
+            gl.glPopMatrix();
         }
     }
 }
