@@ -102,7 +102,7 @@ public class RobotRace extends Base {
         // Initialize the terrain
         terrain = new Terrain(this);
 
-        Tree t = new Tree(this, cd, 0, 0);
+        Tree t = new Tree(this, cd, terrain, 0, 0);
         trees.add(t);
     }
     private ArrayList<Tree> trees = new ArrayList<Tree>();
@@ -385,6 +385,13 @@ public class RobotRace extends Base {
                 new float[]{0f, 1f, 0f, 1.0f},
                 new float[]{0f, 1f, 0f, 1.0f},
                 new float[]{20f}),
+        /**
+         * Leaves material properties.
+         */
+        LEAVES(
+        new float[]{0.435f, 0.69f, 0.333f, 1.0f},
+        new float[]{0.16f, 0.4f, 0.07f, 1.0f},
+        new float[]{20f}),
         /* 
          *Red material properties
          */
@@ -812,16 +819,16 @@ public class RobotRace extends Base {
          */
         private Vector[] controlPointsCustomTrack = {
             new Vector(0, 40, 0), new Vector(0, 30, 0), new Vector(0, 30, 0), new Vector(-10, 30, 0),
-            new Vector(-10, 30, 0), new Vector(-20, 30, 0), new Vector(-20, 30, 0), new Vector(-20, 10, 0),
-            new Vector(-20, 10, 0), new Vector(-20, -10, 0), new Vector(-20, -10, 0), new Vector(-50, -10, 0),
-            new Vector(-50, -10, 0), new Vector(-60, -10, 0), new Vector(-60, -40, 0), new Vector(-50, -40, 0),
+            new Vector(-10, 30, 0), new Vector(-20, 30, 2), new Vector(-20, 30, 2), new Vector(-20, 10, 4),
+            new Vector(-20, 10, 4), new Vector(-20, -10, 5), new Vector(-20, -10, 5), new Vector(-50, -10, 4),
+            new Vector(-50, -10, 4), new Vector(-60, -10, 3), new Vector(-60, -40, 2), new Vector(-50, -40, 0),
             new Vector(-50, -40, 0), new Vector(-30, -40, 0), new Vector(-30, -40, 0), new Vector(-30, -30, 0),
             new Vector(-30, -30, 0), new Vector(-30, -20, 0), new Vector(-30, -20, 0), new Vector(-20, -20, 0),
             new Vector(-20, -20, 0), new Vector(-10, -20, 0), new Vector(-10, -20, 0), new Vector(-10, -60, 0),
             new Vector(-10, -60, 0), new Vector(-10, -70, 0), new Vector(10, -70, 0), new Vector(10, -60, 0),
-            new Vector(10, -60, 0), new Vector(10, -40, 0), new Vector(10, -40, 0), new Vector(20, -40, 0),
-            new Vector(20, -40, 0), new Vector(30, -40, 0), new Vector(30, -40, 0), new Vector(30, 0, 0),
-            new Vector(30, 0, 0), new Vector(30, 10, 0), new Vector(10, 10, 0), new Vector(10, 0, 0),
+            new Vector(10, -60, 0), new Vector(10, -40, 3), new Vector(10, -40, 3), new Vector(20, -40, 6),
+            new Vector(20, -40, 6), new Vector(30, -40, 8), new Vector(30, -40, 8), new Vector(30, 0, 6),
+            new Vector(30, 0, 6), new Vector(30, 10, 4), new Vector(10, 10, 2), new Vector(10, 0, 0),
             new Vector(10, 0, 0), new Vector(10, -20, 0), new Vector(10, -20, 0), new Vector(0, -20, 0),
             new Vector(0, -20, 0), new Vector(-10, -20, 0), new Vector(-10, 20, 0), new Vector(0, 20, 0),
             new Vector(0, 20, 0), new Vector(20, 20, 0), new Vector(20, 20, 0), new Vector(20, 30, 0),
@@ -888,9 +895,11 @@ public class RobotRace extends Base {
 
                         // Calculates a normal vector (in the z direction) the the plane
                         Vector currentNormal = currentPerpendicular.cross(currentTangent).normalized();
-
+                        Vector currentNormalInner = currentNormal.scale(-1);
+                        
                         // Draw the track
                         drawTrack(currentNormal,
+                                currentNormalInner,
                                 currentPerpendicular,
                                 currentPerpendicularInner,
                                 currentTrackOuter,
@@ -1094,7 +1103,7 @@ public class RobotRace extends Base {
             double lowPoint = begin;
             double high = Double.MAX_VALUE;
             double highPoint = end;
-            double partSize = (end - begin) / 20.0;
+            double partSize = (end - begin) / 40.0;
             for (double i = begin; i < end; i += partSize) {
                 double d = getPointSub(i).subtract(v).length();
                 if (d < high) {
@@ -1215,9 +1224,11 @@ public class RobotRace extends Base {
                     Vector nextBaseInner = next.add(nextPerpendicular.scale(-2));
 
                     Vector currentNormal = currentPerpendicular.cross(currentTangent).normalized();
-
+                    Vector currentNormalInner = currentNormal.scale(-1);
+                    
                     // Draws the track
                     drawTrack(currentNormal,
+                            currentNormalInner,
                             currentPerpendicular,
                             currentPerpendicularInner,
                             currentTrackOuter,
@@ -1236,7 +1247,9 @@ public class RobotRace extends Base {
 
         }
 
-        public void drawTrack(Vector currentNormal,
+        public void drawTrack(
+                Vector currentNormal,
+                Vector currentNormalInner,
                 Vector currentPerpendicular,
                 Vector currentPerpendicularInner,
                 Vector currentTrackOuter,
@@ -1298,6 +1311,23 @@ public class RobotRace extends Base {
             gl.glTexCoord2d(0, 0);
             gl.glVertex3d(currentBaseInner.x(), currentBaseInner.y(), currentBaseInner.z());
             gl.glTexCoord2d(1, 0);
+            gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
+            
+            gl.glNormal3d(currentNormalInner.x(), currentNormalInner.y(), currentNormalInner.z());
+            
+            brick.bind(gl);
+            gl.glTexCoord2d(1, 0);
+            gl.glVertex3d(currentBaseOuter.x(), currentBaseOuter.y(), currentBaseOuter.z());
+            gl.glTexCoord2d(1, 1);
+            gl.glVertex3d(nextBaseOuter.x(), nextBaseOuter.y(), nextBaseOuter.z());
+            gl.glTexCoord2d(0, 1);
+            gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
+
+            gl.glTexCoord2d(1, 1);
+            gl.glVertex3d(currentBaseOuter.x(), currentBaseOuter.y(), currentBaseOuter.z());
+            gl.glTexCoord2d(0, 0);
+            gl.glVertex3d(currentBaseInner.x(), currentBaseInner.y(), currentBaseInner.z());
+            gl.glTexCoord2d(0, 1);
             gl.glVertex3d(nextBaseInner.x(), nextBaseInner.y(), nextBaseInner.z());
 
         }
